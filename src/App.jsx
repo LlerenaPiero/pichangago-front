@@ -5,6 +5,7 @@ import AuthModal from './components/AuthModal'; // 🟢 Importamos el nuevo moda
 import './index.css';
 
 const Home = lazy(() => import('./pages/Home'));
+const Buscar = lazy(() => import('./pages/Buscar'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
 
 // COMPONENTE DE PROTECCIÓN DE RUTAS
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cancha/:id" element={<CanchaDetail />} />
+          <Route path="/buscar" element={<Buscar />} />
           
           {/* 🟢 RUTAS DE JUGADOR (Corregido a userRole) */}
           <Route element={<ProtectedRoute allowedRoles={['JUGADOR']} userRole={user?.role} />}>

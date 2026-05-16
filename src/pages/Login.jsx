@@ -14,7 +14,16 @@ const Login = () => {
     // Simulamos que va al backend
     setTimeout(() => {
       setIsLoading(false);
-      // Aquí redirigimos al home después de un login exitoso
+      
+      // 🟢 SIMULAMOS EL LOGIN EXITOSO
+      // Creamos un usuario basado en el rol seleccionado en los tabs
+      const fakeUser = {
+        name: selectedRole === 'jugador' ? 'Diego Salcedo' : 'Claudia Ramos',
+        role: selectedRole.toUpperCase(), // 'JUGADOR' o 'DUENO'
+        avatar: selectedRole === 'jugador' ? 'DS' : 'CR'
+      };
+
+      props.onLogin(fakeUser); // Esto actualiza el estado en App.jsx
       navigate('/');
     }, 1500);
   };

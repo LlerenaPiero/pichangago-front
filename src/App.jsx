@@ -1,54 +1,54 @@
 import { lazy, Suspense, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import AuthModal from './components/AuthModal'; // 🟢 Importamos el nuevo modal
 import './index.css';
 
-// 1. IMPORTACIONES PEREZOSAS (Lo que ya tenías + las nuevas)
 const Home = lazy(() => import('./pages/Home'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
-const Login = lazy(() => import('./pages/Login'));
 
-// 2. COMPONENTE DE PROTECCIÓN DE RUTAS (Matriz de Roles)
+// COMPONENTE DE PROTECCIÓN DE RUTAS
 const ProtectedRoute = ({ allowedRoles, userRole }) => {
-  if (!userRole) return <Navigate to="/login" replace />;
+  if (!userRole) return <Navigate to="/" replace />; // Si no está logueado y quiere forzar ruta, va al Home
   if (!allowedRoles.includes(userRole)) return <Navigate to="/403" replace />;
   return <Outlet />;
 };
 
 function App() {
-  // Simulamos un usuario logueado para que puedas hacer pruebas en el Frontend.
-  // Cuando Carlos (Backend) tenga el JWT, esto lo leeremos de las cookies.
-  const [userRole, setUserRole] = useState(null); // Pon 'JUGADOR' o 'DUENO' para probar
+  const [user, setUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // 🟢 Estado para controlar el Modal
+
+  const logout = () => setUser(null);
 
   return (
     <BrowserRouter>
-      <Navbar />
+      {/* 🟢 Pasamos la función para abrir el modal al Navbar */}
+      <Navbar user={user} onLogout={logout} onOpenLogin={() => setIsModalOpen(true)} />
       
-      {/* 3. TU SUSPENSE OPTIMIZADO (WPO intacto) */}
-      <Suspense fallback={
-        <div style={{ padding: '100px', textAlign: 'center' }}>
-          <h2 style={{ fontFamily: 'var(--font-head)' }}>Cargando pichanga... ⚽</h2>
-        </div>
-      }>
+      {/* 🟢 El Modal vive aquí globalmente para que se superponga a cualquier página */}
+      <AuthModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onLogin={setUser} 
+      />
+      
+      <Suspense fallback={<div style={{ padding: '100px', textAlign: 'center' }}><h2>Cargando... ⚽</h2></div>}>
         <Routes>
-          {/* MÓDULO 1: RUTAS PÚBLICAS (Visitantes) */}
           <Route path="/" element={<Home />} />
           <Route path="/cancha/:id" element={<CanchaDetail />} />
-          <Route path="/login" element={<Login />} />
-
-          {/* MÓDULO 2 Y 4: RUTAS DE JUGADOR */}
-          <Route element={<ProtectedRoute allowedRoles={['JUGADOR']} userRole={userRole} />}>
-            <Route path="/mis-reservas" element={<h2>Aquí irán mis reservas</h2>} />
+          
+          {/* 🟢 RUTAS DE JUGADOR (Corregido a userRole) */}
+          <Route element={<ProtectedRoute allowedRoles={['JUGADOR']} userRole={user?.role} />}>
+            <Route path="/mis-reservas" element={<div className="page-wrap"><h2>Mis Reservas</h2><p>Bienvenido, Jugador.</p></div>} />
           </Route>
 
-          {/* MÓDULO 3: RUTAS DE DUEÑO */}
-          <Route element={<ProtectedRoute allowedRoles={['DUENO']} userRole={userRole} />}>
-            <Route path="/panel-dueno" element={<h2>Aquí irá el dashboard</h2>} />
+          {/* 🟢 RUTAS DE DUEÑO (Corregido a userRole) */}
+          <Route element={<ProtectedRoute allowedRoles={['DUENO']} userRole={user?.role} />}>
+            <Route path="/panel-dueno" element={<div className="page-wrap"><h2>Panel de Administración</h2><p>Bienvenido, Dueño de Cancha.</p></div>} />
           </Route>
 
-          {/* ERRORES HTTP (Requerimiento del profesor) */}
-          <Route path="/403" element={<div style={{padding:'50px', textAlign:'center'}}><h2>403 - No tienes permiso para ver esto 🚫</h2></div>} />
-          <Route path="*" element={<div style={{padding:'50px', textAlign:'center'}}><h2>404 - Página no encontrada 🕵️‍♂️</h2></div>} />
+          <Route path="/403" element={<div style={{padding:'50px', textAlign:'center'}}><h2>403 - Acceso Denegado 🚫</h2></div>} />
+          <Route path="*" element={<div style={{padding:'50px', textAlign:'center'}}><h2>404 - No encontrado</h2></div>} />
         </Routes>
       </Suspense>
     </BrowserRouter>

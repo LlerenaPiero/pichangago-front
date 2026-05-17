@@ -12,6 +12,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Buscar = lazy(() => import('./pages/Buscar'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
 const MisReservas = lazy(() => import('./pages/MisReservas'));
+const SystemStatus = lazy(() => import('./pages/SystemStatus'));
 
 // 🚧 COMPONENTE TEMPORAL (Evita el error de archivo no encontrado hasta iniciar la Épica 5)
 const PanelDuenoPlaceholder = () => (
@@ -69,6 +70,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/buscar" element={<Buscar />} /> 
           <Route path="/cancha/:id" element={<CanchaDetail />} />
+          <Route path="/status" element={<SystemStatus />} />
 
           {/* 🔐 MIDDLEWARE: SÓLO JUGADORES (Épica 4) */}
           <Route element={<ProtectedRoute user={user} allowedRoles={['JUGADOR']} />}>

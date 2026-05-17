@@ -7,6 +7,7 @@ import './index.css';
 const Home = lazy(() => import('./pages/Home'));
 const Buscar = lazy(() => import('./pages/Buscar'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
+const MisReservas = lazy(() => import('./pages/MisReservas'));
 
 // COMPONENTE DE PROTECCIÓN DE RUTAS
 const ProtectedRoute = ({ allowedRoles, userRole }) => {
@@ -38,7 +39,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cancha/:id" element={<CanchaDetail />} />
           <Route path="/buscar" element={<Buscar />} />
-          
+          <Route path="/mis-reservas" element={<MisReservas />} />
           {/* 🟢 RUTAS DE JUGADOR (Corregido a userRole) */}
           <Route element={<ProtectedRoute allowedRoles={['JUGADOR']} userRole={user?.role} />}>
             <Route path="/mis-reservas" element={<div className="page-wrap"><h2>Mis Reservas</h2><p>Bienvenido, Jugador.</p></div>} />

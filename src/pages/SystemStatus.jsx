@@ -4,37 +4,41 @@ const SystemStatus = () => {
   const [webStatus, setWebStatus] = useState({ loading: true, code: null, label: '' });
   const [dbStatus, setDbStatus] = useState({ loading: true, code: null, label: '', latency: 0 });
 
-  const verificarServicios = async () => {
-    setWebStatus({ loading: true, code: null, label: '' });
-    setDbStatus({ loading: true, code: null, label: '', latency: 0 });
+const verificarServicios = async () => {
+  setWebStatus({ loading: true, code: null, label: '' });
+  setDbStatus({ loading: true, code: null, label: '', latency: 0 });
 
-    // 1. Testear disponibilidad de la Web (Frontend)
-    setTimeout(() => {
-      setWebStatus({ loading: false, code: 200, label: 'OPERATIONAL' });
-    }, 600);
+  // 1. Testear disponibilidad de la Web (Frontend)
+  setTimeout(() => {
+    setWebStatus({ loading: false, code: 200, label: 'OPERATIONAL' });
+  }, 400);
 
-    // 2. Testear disponibilidad de la Base de Datos (Supabase / API Rest)
-    const inicio = performance.now();
-    try {
-      // Intentamos hacer un fetch básico al endpoint de Supabase (o un ping simulado controlado)
-      const response = await fetch('https://api.supabase.co', { method: 'HEAD' }).catch(() => ({ status: 200 }));
-      const fin = performance.now();
-      const latenciaCalculada = Math.round(fin - inicio);
+  // 2. DETECTOR DINÁMICO: Usa la URL de Render en producción o localhost si estás programando en tu PC
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-      if (response.status === 200 || response.status === 204) {
-        setDbStatus({
-          loading: false,
-          code: 200,
-          label: 'CONNECTED',
-          latency: latenciaCalculada || 45
-        });
-      } else {
-        setDbStatus({ loading: false, code: 500, label: 'DATABASE_ERROR', latency: 0 });
-      }
-    } catch (error) {
-      setDbStatus({ loading: false, code: 500, label: 'DISCONNECTED', latency: 0 });
+  try {
+    const response = await fetch(`${API_URL}/api/status`);
+    const data = await response.json();
+
+    if (response.ok && data.database === 'CONNECTED') {
+      setDbStatus({
+        loading: false,
+        code: data.statusCode,
+        label: data.database,
+        latency: data.latency
+      });
+    } else {
+      setDbStatus({ 
+        loading: false, 
+        code: data.statusCode || 500, 
+        label: data.database || 'DATABASE_ERROR', 
+        latency: data.latency || 0 
+      });
     }
-  };
+  } catch (error) {
+    setDbStatus({ loading: false, code: 500, label: 'SERVER_DOWN', latency: 0 });
+  }
+};
 
   useEffect(() => {
     verificarServicios();
@@ -70,7 +74,7 @@ const SystemStatus = () => {
         {/* SERVICIO 2: BASE DE DATOS */}
         <div style={{ background: 'var(--white)', border: '1px solid var(--gray2)', borderRadius: 'var(--r12)', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontWeight: 700, color: 'var(--dark1)', fontSize: '15px' }}>🗄️ Capa de Datos (Supabase Cloud)</div>
+            <div style={{ fontWeight: 700, color: 'var(--dark1)', fontSize: '15px' }}>🗄️ Capa de Datos (AZURE sql server)</div>
             <div style={{ fontSize: '13px', color: 'var(--textMid)', marginTop: '2px' }}>
               Latencia de respuesta de red: {dbStatus.latency > 0 ? `<strong>${dbStatus.latency}ms</strong>` : '—'}
             </div>

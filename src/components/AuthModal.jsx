@@ -16,7 +16,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
 
   if (!isOpen) return null;
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = 'https://pichangago-backend.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

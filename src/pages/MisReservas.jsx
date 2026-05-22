@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService'; // 🔒 IMPORTAMOS SEGURIDAD
+import { authService } from '../services/authService'; // 👈 Importamos el servicio
 
 // ── DATA REAL DE TU PROTOTIPO (pichangago-data.js)
 const CANCHAS_MOCK = {
@@ -17,23 +16,23 @@ const RESERVAS_MOCK = [
 ];
 
 const MisReservas = () => {
-  const [activeTab, setActiveTab] = useState('proximas'); 
+  const [activeTab, setActiveTab] = useState('proximas');
   const [selectedReserva, setSelectedReserva] = useState(null);
   const [reservas, setReservas] = useState(RESERVAS_MOCK);
-  const navigate = useNavigate();
 
-  // 🛡️ REGLA MATRIZ M4: BLOQUEO DE RUTA PARA INVITADOS Y DUEÑOS
+  // 🛡️ TRAMPA PARA EL INCÓGNITO: Obligamos a la pantalla a validar el token con el backend
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    
-    if (!currentUser) {
-      alert("⚠️ Acceso Restringido: Debes iniciar sesión para ver tus reservas.");
-      navigate('/');
-    } else if (currentUser.rol === 'DUENO' || currentUser.role === 'DUENO') {
-      alert("⛔ Acceso Restringido: El historial de reservas es exclusivo para el perfil de Jugador.");
-      navigate('/');
-    }
-  }, [navigate]);
+    const verificarSesionGlobal = async () => {
+      try {
+        // Hacemos un ping al backend protegido para forzar la validación de la lista negra
+        await authService.fetchProtected('/api/status');
+      } catch (error) {
+        // Si el token está en lista negra, el interceptor ya habrá cerrado la sesión automáticamente
+        console.warn('La sesión fue destruida remotamente.');
+      }
+    };
+    verificarSesionGlobal();
+  }, []);
 
   const filtradas = reservas.filter(r => {
     if (activeTab === 'proximas') return r.estado === 'confirmada';
@@ -74,16 +73,10 @@ const MisReservas = () => {
         </div>
 
         <div className="reservas-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'proximas' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('proximas')}
-          >
+          <button className={`tab-btn ${activeTab === 'proximas' ? 'active' : ''}`} onClick={() => setActiveTab('proximas')}>
             Próximas
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'historial' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('historial')}
-          >
+          <button className={`tab-btn ${activeTab === 'historial' ? 'active' : ''}`} onClick={() => setActiveTab('historial')}>
             Historial
           </button>
         </div>
@@ -126,16 +119,17 @@ const MisReservas = () => {
             </div>
           )}
         </div>
-
       </div>
 
+      {/* 🚨 MODAL DETALLE DE RESERVA BLINDADO 🚨 */}
       {selectedReserva && (() => {
         const cancha = CANCHAS_MOCK[selectedReserva.canchaId];
         return (
           <div className="overlay" style={{ display: 'flex', position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
             <div className="modal" style={{ background: 'var(--white)', borderRadius: 'var(--r24)', width: '100%', maxWidth: '440px', overflow: 'hidden' }}>
               
-              <div className="modal-head" style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--gray2)', display: 'flex', alignItems: 'center', justifyContainer: 'space-between' }}>
+              {/* ¡CORREGIDO: justifyContent! */}
+              <div className="modal-head" style={{ padding: '20px 24px 16px', borderBottom: '1px solid var(--gray2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div className="modal-title">Detalle de reserva</div>
                 <button className="modal-close" onClick={() => setSelectedReserva(null)} style={{ border: 'none', background: 'none', fontSize: '18px', cursor: 'pointer', color: 'var(--gray4)' }}>✕</button>
               </div>
@@ -160,7 +154,10 @@ const MisReservas = () => {
                   </div>
                   <div className="resumen-row"><span>Fecha</span><span>{selectedReserva.fecha}</span></div>
                   <div className="resumen-row"><span>Horario</span><strong>{selectedReserva.inicio} – {selectedReserva.fin}</strong></div>
-                  <div className="resumen-row"><span>Precio total</span><strong>S/ {selectedReserva.precio.toFixed(2)}</strong></div>
+                  
+                  {/* ¡CORREGIDO: OPTIONAL CHAINING PARA EVITAR PANTALLA BLANCA! */}
+                  <div className="resumen-row"><span>Precio total</span><strong>S/ {selectedReserva?.precio?.toFixed(2) || '0.00'}</strong></div>
+                  
                   <div className="resumen-row" style={{ borderBottom: 'none' }}>
                     <span>Estado del pago</span>
                     <span style={{ color: 'var(--green2)', fontWeight: 700 }}>100% Pagado Online</span>

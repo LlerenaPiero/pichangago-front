@@ -15,8 +15,8 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
   const [successMessage, setSuccessMessage] = useState('');
 
   if (!isOpen) return null;
-
-  const API_URL = 'https://pichangago-backend.onrender.com';
+// En AuthModal.jsx cambia el enlace estático por la variable de entorno global:
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,8 +56,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
         setEmail('');
       }
     } catch (error) {
-      // 🚨 AQUÍ ESTÁ LA MAGIA: ATRAPAMOS EL MENSAJE DE LA RAM DEL SERVIDOR
-      setErrorMessage(error.message || 'Ocurrió un problema de conexión.');
+      setErrorMessage(error.message || 'Ocurrió un problema.');
     } finally {
       setIsLoading(false);
     }
@@ -105,13 +104,12 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
           </div>
         )}
 
-        {/* 🚨 MENSAJES DE ALERTA DINÁMICOS */}
+        {/* MENSAJES DE ALERTA */}
         {errorMessage && (
-          <div style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: 'bold', border: '1px solid #fca5a5' }}>
-            ⚠️ {errorMessage}
+          <div style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: '500', border: '1px solid #fca5a5' }}>
+            ❌ {errorMessage}
           </div>
         )}
-        
         {successMessage && (
           <div style={{ backgroundColor: '#d1fae5', color: '#047857', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: '500', border: '1px solid #6ee7b7' }}>
             {successMessage}

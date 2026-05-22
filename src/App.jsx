@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal'; 
 import './index.css';
+import { authService } from './services/authService';
 
 // 🔌 Importamos las utilidades de cookies para persistencia OWASP
 import { getSessionCookie, setSessionCookie, eraseSessionCookie } from './utils/cookies';
@@ -47,9 +48,10 @@ function App() {
     setIsModalOpen(false);
   };
 
-  const logout = () => {
+const logout = () => {
     setUser(null);
-    eraseSessionCookie(); // 🗑️ Destruye la cookie inmediatamente del navegador
+    eraseSessionCookie(); // 🗑️ Destruye la cookie local del navegador
+    authService.logout(); // 🚀 Dispara el endpoint que quema la sesión en la RAM del backend
   };
 
   return (

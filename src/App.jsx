@@ -13,6 +13,7 @@ const Buscar = lazy(() => import('./pages/Buscar'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
 const MisReservas = lazy(() => import('./pages/MisReservas'));
 const SystemStatus = lazy(() => import('./pages/SystemStatus'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 // 🚧 COMPONENTE TEMPORAL (Evita el error de archivo no encontrado hasta iniciar la Épica 5)
 const PanelDuenoPlaceholder = () => (
@@ -69,7 +70,8 @@ function App() {
           {/* 🔓 RUTAS PÚBLICAS */}
           <Route path="/" element={<Home />} />
           <Route path="/buscar" element={<Buscar />} /> 
-          
+          <Route path="/reset-password" element={<ResetPassword />} /> {/* 👈 NUEVA RUTA AQUÍ */}
+
           {/* 🎯 CONEXIÓN ESTRELLA: Pasamos la función para abrir el Modal desde la ruta del detalle */}
           <Route path="/cancha/:id" element={<CanchaDetail onOpenLogin={() => setIsModalOpen(true)} />} />
           

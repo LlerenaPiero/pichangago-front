@@ -15,6 +15,11 @@ const MisReservas = lazy(() => import('./pages/MisReservas'));
 const SystemStatus = lazy(() => import('./pages/SystemStatus'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
+// PÁGINAS DEL DUEÑO
+const DuenoOnboarding = lazy(() => import('./pages/dueno/DuenoOnboarding'));
+const RegistroCanchaForm = lazy(() => import('./pages/dueno/RegistroCanchaForm'));
+const PerfilFinanciero = lazy(() => import('./pages/dueno/PerfilFinanciero'));
+
 // 🚧 COMPONENTE TEMPORAL (Evita el error de archivo no encontrado hasta iniciar la Épica 5)
 const PanelDuenoPlaceholder = () => (
   <div className="view active page-wrap" style={{ padding: '80px 24px', textAlign: 'center' }}>
@@ -83,8 +88,14 @@ function App() {
           </Route>
 
           {/* 🔐 MIDDLEWARE: SÓLO DUEÑOS (Épica 5) */}
-          <Route element={<ProtectedRoute user={user} allowedRoles={['DUENO']} />}>
+          <Route element={<ProtectedRoute user={user} allowedRoles={['DUEÑO', 'DUENO']} />}>
+            {/* Ruta base del Panel */}
             <Route path="/panel-dueno" element={<PanelDuenoPlaceholder />} />
+            
+            {/* 🏁 Rutas del Momento 1: Onboarding y Configuraciones */}
+            <Route path="/panel-dueno/onboarding" element={<DuenoOnboarding />} />
+            <Route path="/panel-dueno/registrar-cancha" element={<RegistroCanchaForm />} />
+            <Route path="/panel-dueno/perfil-financiero" element={<PerfilFinanciero />} />
           </Route>
 
           {/* Redirección por defecto si meten una URL errónea */}

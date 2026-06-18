@@ -88,7 +88,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
           {authMode === 'forgot' ? 'Recuperar Contraseña' : 'Acceder a PichangaGo'}
         </h3>
 
-        {/* TABS DE NAVEGACIÓN SUPERIOR */}
+       
         {authMode !== 'forgot' && (
           <div style={{ display: 'flex', borderBottom: '1px solid #e2e8f0', marginBottom: '24px' }}>
             <button 
@@ -108,7 +108,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
           </div>
         )}
 
-        {/* SELECTOR DE ROL */}
+    
         {authMode === 'register' && (
           <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
             <button type="button" onClick={() => setRole('JUGADOR')} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: role === 'JUGADOR' ? '2px solid #00b48a' : '1px solid #e2e8f0', backgroundColor: role === 'JUGADOR' ? '#e6f8f4' : 'white', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
@@ -126,7 +126,6 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
             ⚠️ {errorMessage}
           </div>
         )}
-        
         {successMessage && (
           <div role="status" style={{ backgroundColor: '#d1fae5', color: '#047857', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: '500', border: '1px solid #6ee7b7' }}>
             {successMessage}

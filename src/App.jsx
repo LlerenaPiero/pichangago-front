@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
+import { authService } from './services/authService';
+
 
 import { getSessionCookie, setSessionCookie, eraseSessionCookie } from './utils/cookies';
 
@@ -67,7 +69,7 @@ function AppContent() {
     }
   };
 
-  const logout = () => {
+const logout = () => {
     setUser(null);
     eraseSessionCookie();
     navigate('/');

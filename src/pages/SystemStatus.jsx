@@ -8,12 +8,10 @@ const verificarServicios = async () => {
   setWebStatus({ loading: true, code: null, label: '' });
   setDbStatus({ loading: true, code: null, label: '', latency: 0 });
 
-  // 1. Testear disponibilidad de la Web (Frontend)
-  setTimeout(() => {
-    setWebStatus({ loading: false, code: 200, label: 'OPERATIONAL' });
-  }, 400);
+  // 1. Frontend status is always operational if this page renders
+  setWebStatus({ loading: false, code: 200, label: 'OPERATIONAL' });
 
-  // 2. DETECTOR DINÁMICO: Usa la URL de Render en producción o localhost si estás programando en tu PC
+  // 2. Check backend health
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   try {
@@ -35,12 +33,13 @@ const verificarServicios = async () => {
         latency: data.latency || 0 
       });
     }
-  } catch (error) {
+  } catch {
     setDbStatus({ loading: false, code: 500, label: 'SERVER_DOWN', latency: 0 });
   }
 };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     verificarServicios();
   }, []);
 
@@ -76,7 +75,7 @@ const verificarServicios = async () => {
           <div style={{ textAlign: 'left' }}>
             <div style={{ fontWeight: 700, color: 'var(--dark1)', fontSize: '15px' }}>🗄️ Capa de Datos (AZURE sql server)</div>
             <div style={{ fontSize: '13px', color: 'var(--textMid)', marginTop: '2px' }}>
-              Latencia de respuesta de red: {dbStatus.latency > 0 ? `<strong>${dbStatus.latency}ms</strong>` : '—'}
+              Latencia de respuesta de red: {dbStatus.latency > 0 ? <strong>{dbStatus.latency}ms</strong> : '—'}
             </div>
           </div>
           <div>

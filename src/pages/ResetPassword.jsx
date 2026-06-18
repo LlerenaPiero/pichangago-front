@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
@@ -12,7 +12,7 @@ const ResetPassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const API_URL = 'https://pichangago-backend.onrender.com';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,6 +21,11 @@ const ResetPassword = () => {
     setMessage('');
 
     // Validación básica de seguridad
+    if (newPassword.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
+      setIsLoading(false);
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError('Las contraseñas no coinciden. Inténtalo de nuevo.');
       setIsLoading(false);

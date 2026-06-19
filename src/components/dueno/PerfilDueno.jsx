@@ -183,7 +183,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
             <div style={{
                 display: 'flex', alignItems: 'center', gap: '20px',
                 borderRadius: '12px', padding: '28px',
-                background: 'linear-gradient(135deg, #00b48a 0%, #00916e 100%)',
+                background: 'linear-gradient(135deg, #008060 0%, #00916e 100%)',
                 color: '#fff', marginBottom: '28px', boxShadow: '0 2px 8px rgba(0,180,138,0.2)'
             }}>
                 <div style={{
@@ -225,7 +225,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
                     <input type="text" value={form.telefono} maxLength={9}
                         style={inputStyle}
                         onChange={e => /^\d*$/.test(e.target.value) && handleChange('telefono', e.target.value)} />
-                    <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', display: 'block' }}>9 dígitos, solo números</span>
+                    <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px', display: 'block' }}>9 dígitos, solo números</span>
                 </div>
 
                 <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '24px 0' }} />
@@ -248,7 +248,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
                         <input type={mostrarSensibles ? 'text' : 'password'} value={form.ruc} maxLength={11}
                             style={inputStyle}
                             onChange={e => /^\d*$/.test(e.target.value) && handleChange('ruc', e.target.value)} />
-                        <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', display: 'block' }}>11 dígitos — 10 (natural) o 20 (jurídico)</span>
+                        <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px', display: 'block' }}>11 dígitos — 10 (natural) o 20 (jurídico)</span>
                     </div>
                     <div>
                         <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Razón Social</label>
@@ -260,15 +260,15 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
                     <div>
-                        <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Banco</label>
-                        <select value={form.banco} style={inputStyle}
+                        <label htmlFor="pd-banco" style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Banco</label>
+                        <select id="pd-banco" value={form.banco} style={inputStyle}
                             onChange={e => handleChange('banco', e.target.value)}>
                             <option value="">— Auto-detectar —</option>
                             <option value="BCP">BCP</option>
                             <option value="Interbank">Interbank</option>
                             <option value="BBVA">BBVA</option>
                         </select>
-                        <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', display: 'block' }}>
+                        <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px', display: 'block' }}>
                             {form.banco
                                 ? `✅ Banco seleccionado: ${form.banco}`
                                 : form.cci.length >= 4 ? (detectarBanco(form.cci) ? `🔍 Detectado: ${detectarBanco(form.cci)}` : '⚠️ CCI no reconocido') : ''}
@@ -279,7 +279,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
                         <input type={mostrarSensibles ? 'text' : 'password'} value={form.cci} maxLength={20}
                             style={inputStyle}
                             onChange={e => handleCciChange(e.target.value)} />
-                        <span style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px', display: 'block' }}>20 dígitos, solo números</span>
+                        <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px', display: 'block' }}>20 dígitos, solo números</span>
                     </div>
                 </div>
 
@@ -302,7 +302,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
 
                 <button type="submit" disabled={guardando}
                     style={{
-                        background: guardando ? '#9ca3af' : '#00b48a', color: 'white', border: 'none',
+                        background: guardando ? '#9ca3af' : '#008060', color: 'white', border: 'none',
                         padding: '12px 32px', borderRadius: '8px', fontWeight: 'bold', fontSize: '15px',
                         cursor: guardando ? 'not-allowed' : 'pointer', width: '100%',
                         transition: 'background 0.2s'

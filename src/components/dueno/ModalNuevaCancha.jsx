@@ -57,28 +57,28 @@ export default function ModalNuevaCancha({ locales, onCerrar, onMensaje, onActua
                         <div style={{ flex: 1, minWidth: '130px' }}>
                             <label htmlFor="nueva-precioBase">💰 Precio Base:</label>
                             <input id="nueva-precioBase" type="number" min={1} required style={{ width: '100%', padding: '6px' }} placeholder="Ej: 70" value={nuevaCancha.precioBase} onChange={e => /^\d*\.?\d*$/.test(e.target.value) && setNuevaCancha({ ...nuevaCancha, precioBase: e.target.value })} />
-                            <span style={{ fontSize: '11px', color: '#888' }}>Horario normal</span>
+                            <span style={{ fontSize: '11px', color: '#6b7280' }}>Horario normal</span>
                         </div>
                         <div style={{ flex: 1, minWidth: '130px' }}>
                             <label htmlFor="nueva-precioPrime">⭐ P. Prime:</label>
                             <input id="nueva-precioPrime" type="number" min={1} style={{ width: '100%', padding: '6px' }} placeholder="Opcional" value={nuevaCancha.precioPrime} onChange={e => /^\d*\.?\d*$/.test(e.target.value) && setNuevaCancha({ ...nuevaCancha, precioPrime: e.target.value })} />
-                            <span style={{ fontSize: '11px', color: '#888' }}>Noches/Finde</span>
+                            <span style={{ fontSize: '11px', color: '#6b7280' }}>Noches/Finde</span>
                         </div>
                         <div style={{ flex: 1, minWidth: '130px' }}>
                             <label htmlFor="nueva-precioBaja">🌅 P. Baja:</label>
                             <input id="nueva-precioBaja" type="number" min={1} style={{ width: '100%', padding: '6px' }} placeholder="Opcional" value={nuevaCancha.precioBaja} onChange={e => /^\d*\.?\d*$/.test(e.target.value) && setNuevaCancha({ ...nuevaCancha, precioBaja: e.target.value })} />
-                            <span style={{ fontSize: '11px', color: '#888' }}>Mañanas/Valle</span>
+                            <span style={{ fontSize: '11px', color: '#6b7280' }}>Mañanas/Valle</span>
                         </div>
                     </div>
                     <div style={{ marginBottom: '15px' }}>
                         <label htmlFor="nueva-foto" style={{ fontWeight: 'bold' }}>📷 Foto <span style={{ color: 'red' }}>*</span>:</label>
                         <input id="nueva-foto" type="file" accept="image/jpeg,image/png,image/webp,image/avif" required style={{ width: '100%', padding: '4px' }} onChange={e => { if (e.target.files.length > 0) setNuevaCanchaFoto(e.target.files[0]); }} />
-                        <span style={{ fontSize: '11px', color: '#888' }}>JPG/PNG/WebP/AVIF — Máx 5MB</span>
-                        {nuevaCanchaFoto && <p style={{ fontSize: '12px', color: '#00b48a', marginTop: '4px' }}>✅ {nuevaCanchaFoto.name}</p>}
+                        <span style={{ fontSize: '11px', color: '#6b7280' }}>JPG/PNG/WebP/AVIF — Máx 5MB</span>
+                        {nuevaCanchaFoto && <p style={{ fontSize: '12px', color: '#008060', marginTop: '4px' }}>✅ {nuevaCanchaFoto.name}</p>}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                         <button type="button" onClick={() => { setNuevaCancha(canchaVacia()); setNuevaCanchaFoto(null); onCerrar(); }} style={{ background: '#eee', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>Cancelar</button>
-                        <button type="submit" style={{ background: '#00b48a', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>Guardar</button>
+                        <button type="submit" style={{ background: '#008060', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>Guardar</button>
                     </div>
                 </form>
             </div>

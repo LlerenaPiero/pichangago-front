@@ -22,7 +22,7 @@ function InfoRow({ label, value, color }) {
 function SectionCard({ title, icon, children }) {
     return (
         <div style={{ marginBottom: '16px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px 0' }}>
+            <p style={{ fontSize: '12px', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px 0' }}>
                 {icon} {title}
             </p>
             <div style={{ background: '#f9fafb', borderRadius: '10px', padding: '12px 16px' }}>
@@ -102,7 +102,7 @@ export default function ModalDetalleReserva({ idReserva, onCerrar }) {
                     {cargandoDetalle ? (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}>
                             <div style={{ fontSize: '32px', marginBottom: '8px' }}>⏳</div>
-                            <p style={{ color: '#9ca3af', margin: 0 }}>Cargando detalle...</p>
+                            <p style={{ color: '#6b7280', margin: 0 }}>Cargando detalle...</p>
                         </div>
                     ) : reservaDetalle ? (
                         <>
@@ -177,7 +177,7 @@ export default function ModalDetalleReserva({ idReserva, onCerrar }) {
                     ) : (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}>
                             <div style={{ fontSize: '32px', marginBottom: '8px' }}>❌</div>
-                            <p style={{ color: '#9ca3af', margin: 0 }}>No se pudo cargar el detalle.</p>
+                            <p style={{ color: '#6b7280', margin: 0 }}>No se pudo cargar el detalle.</p>
                         </div>
                     )}
                 </div>

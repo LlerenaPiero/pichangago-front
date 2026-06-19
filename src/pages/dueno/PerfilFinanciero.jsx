@@ -52,7 +52,7 @@ export default function PerfilFinanciero({ onConfiguracionExitosa }) {
                 <div>
                     <label htmlFor="pf-ruc" title="Registro Único de Contribuyente, 11 dígitos">📋 RUC <span style={{ color: 'red' }}>*</span>:</label>
                     <input id="pf-ruc" type="text" name="ruc" value={formData.ruc} maxLength={11} required aria-required="true" onChange={handleChange} placeholder="12345678901" title="RUC de 11 dígitos" aria-describedby="pf-ruc-help" style={{ width: '100%', marginBottom: '4px', padding: '6px' }} />
-                    <span id="pf-ruc-help" style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '10px' }}>11 dígitos, solo números</span>
+                    <span id="pf-ruc-help" style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '10px' }}>11 dígitos, solo números</span>
                 </div>
                 <div>
                     <label htmlFor="pf-razonSocial" title="Nombre o razón social del titular de la cuenta">🏢 Razón Social <span style={{ color: 'red' }}>*</span>:</label>
@@ -67,9 +67,9 @@ export default function PerfilFinanciero({ onConfiguracionExitosa }) {
                 <div>
                     <label htmlFor="pf-cci" title="Código de Cuenta Interbancario, 20 dígitos">🔢 CCI <span style={{ color: 'red' }}>*</span>:</label>
                     <input id="pf-cci" type="text" name="cci" value={formData.cci} maxLength={20} required aria-required="true" onChange={handleChange} placeholder="12345678901234567890" title="CCI de 20 dígitos" aria-describedby="pf-cci-help" style={{ width: '100%', marginBottom: '4px', padding: '6px' }} />
-                    <span id="pf-cci-help" style={{ fontSize: '11px', color: '#888', display: 'block', marginBottom: '20px' }}>20 dígitos, solo números</span>
+                    <span id="pf-cci-help" style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '20px' }}>20 dígitos, solo números</span>
                 </div>
-                <button type="submit" style={{ background: '#00b48a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
+                <button type="submit" style={{ background: '#008060', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', width: '100%' }}>
                     Guardar Configuración Financiera
                 </button>
             </form>

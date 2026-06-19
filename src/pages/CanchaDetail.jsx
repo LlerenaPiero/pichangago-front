@@ -179,7 +179,7 @@ const CanchaDetail = ({ onOpenLogin }) => {
     };
 
     if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}><h2>Cargando cancha... ⚽</h2></div>;
-    if (error) return <div style={{ padding: '100px', textAlign: 'center' }}><h2>❌ {error}</h2><button onClick={() => navigate(-1)} style={{ background: '#00b48a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', marginTop: '12px' }}>← Volver</button></div>;
+    if (error) return <div style={{ padding: '100px', textAlign: 'center' }}><h2>❌ {error}</h2><button onClick={() => navigate(-1)} style={{ background: '#008060', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', marginTop: '12px' }}>← Volver</button></div>;
     if (!cancha) return null;
 
     return (
@@ -208,13 +208,13 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                 )}
                             </>
                         ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '48px' }}>{SportIcon({ tipo: cancha.Tipo_Deporte })}</div>
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontSize: '48px' }}>{SportIcon({ tipo: cancha.Tipo_Deporte })}</div>
                         )}
                     </div>
 
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                            <span style={{ color: '#00b48a', fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>{cancha.Distrito}</span>
+                            <span style={{ color: '#008060', fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.8px' }}>{cancha.Distrito}</span>
                             {cancha.Rating > 0 && (
                                 <span style={{ background: '#fffbeb', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', color: '#92400e', border: '1px solid #fde68a', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                                     ⭐ {cancha.Rating.toFixed(1)} <span style={{ fontWeight: 'normal', color: '#a16207' }}>({cancha.TotalReviews})</span>
@@ -262,7 +262,7 @@ const CanchaDetail = ({ onOpenLogin }) => {
                         <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto' }}>
                             {generarFechasSelector().map(fecha => (
                                 <button key={fecha.index} onClick={() => { setSelectedDayIndex(fecha.index); setSelectedSlots([]); }}
-                                    style={{ flex: 1, minWidth: '56px', padding: '9px 4px', borderRadius: '8px', border: selectedDayIndex === fecha.index ? '2px solid #00b48a' : '1px solid #ddd', background: selectedDayIndex === fecha.index ? '#e6f8f4' : '#fafafa', cursor: 'pointer', textAlign: 'center', fontWeight: selectedDayIndex === fecha.index ? 'bold' : 'normal', transition: 'all 0.15s' }}>
+                                    style={{ flex: 1, minWidth: '56px', padding: '9px 4px', borderRadius: '8px', border: selectedDayIndex === fecha.index ? '2px solid #008060' : '1px solid #ddd', background: selectedDayIndex === fecha.index ? '#e6f8f4' : '#fafafa', cursor: 'pointer', textAlign: 'center', fontWeight: selectedDayIndex === fecha.index ? 'bold' : 'normal', transition: 'all 0.15s' }}>
                                     <div style={{ fontSize: '11px', color: '#666' }}>{fecha.diaNombre}</div>
                                     <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{fecha.diaNumero}</div>
                                 </button>
@@ -277,10 +277,10 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                 const precio = obtenerPrecioSlot(slot);
                                 return (
                                     <div key={slot.ID_Slots} onClick={() => !ocupado && handleSelectSlot(slot)}
-                                        style={{ padding: '10px 4px', borderRadius: '8px', border: seleccionado ? '2px solid #00b48a' : ocupado ? '1px solid #e0e0e0' : '1px solid #ccc', background: seleccionado ? '#e6f8f4' : ocupado ? '#f5f5f5' : esOferta ? '#fff8e1' : '#fff', cursor: ocupado ? 'not-allowed' : 'pointer', textAlign: 'center', opacity: ocupado ? 0.55 : 1, position: 'relative', transition: 'all 0.15s' }}>
+                                        style={{ padding: '10px 4px', borderRadius: '8px', border: seleccionado ? '2px solid #008060' : ocupado ? '1px solid #e0e0e0' : '1px solid #ccc', background: seleccionado ? '#e6f8f4' : ocupado ? '#f5f5f5' : esOferta ? '#fff8e1' : '#fff', cursor: ocupado ? 'not-allowed' : 'pointer', textAlign: 'center', opacity: ocupado ? 0.55 : 1, position: 'relative', transition: 'all 0.15s' }}>
                                         {esOferta && <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: '#ffc107', color: '#333', fontSize: '8px', fontWeight: 'bold', padding: '1px 5px', borderRadius: '4px' }}>−20%</span>}
                                         <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{formatHora(slot.Hora_Inicio)}</div>
-                                        <div style={{ fontSize: '11px', color: ocupado ? '#999' : '#00b48a', fontWeight: 'bold', marginTop: '2px' }}>
+                                        <div style={{ fontSize: '11px', color: ocupado ? '#999' : '#008060', fontWeight: 'bold', marginTop: '2px' }}>
                                             {ocupado ? '—' : `S/ ${precio.toFixed(0)}`}
                                         </div>
                                     </div>
@@ -295,20 +295,20 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                         <span style={{ color: '#666' }}>Horas elegidas</span>
                                         <span style={{ fontWeight: 'bold' }}>{selectedSlots.length} hr</span>
                                     </div>
-                                    <div style={{ fontSize: '12px', color: '#888', marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
                                         {selectedSlots.map(s => `${formatHora(s.Hora_Inicio)}-${formatHora(s.Hora_Fin)}`).join(', ')}
                                     </div>
                                     <div style={{ display: 'flex', justifycontent: 'space-between', borderTop: '1px solid #ddd', paddingTop: '8px' }}>
-                                        <span style={{ color: '#00b48a', fontWeight: 'bold', fontSize: '14px' }}>Total a pagar</span>
-                                        <span style={{ color: '#00b48a', fontWeight: 'bold', fontSize: '18px' }}>S/ {totalPrecio.toFixed(2)}</span>
+                                        <span style={{ color: '#008060', fontWeight: 'bold', fontSize: '14px' }}>Total a pagar</span>
+                                        <span style={{ color: '#008060', fontWeight: 'bold', fontSize: '18px' }}>S/ {totalPrecio.toFixed(2)}</span>
                                     </div>
                                 </div>
-                                <button onClick={handleOpenReserva} style={{ width: '100%', background: '#00b48a', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>
+                                <button onClick={handleOpenReserva} style={{ width: '100%', background: '#008060', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>
                                     Reservar y Pagar ({selectedSlots.length} hrs) →
                                 </button>
                             </div>
                         ) : (
-                            <div style={{ textAlign: 'center', color: '#999', fontSize: '13px', padding: '8px' }}>
+                            <div style={{ textAlign: 'center', color: '#6b7280', fontSize: '13px', padding: '8px' }}>
                                 Selecciona uno o más horarios disponibles
                             </div>
                         )}
@@ -322,13 +322,13 @@ const CanchaDetail = ({ onOpenLogin }) => {
                     <div role="dialog" aria-modal="true" aria-label="Reserva" style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '520px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #eee' }}>
                             <div style={{ fontWeight: 'bold', fontSize: '14px' }}>Paso {step} de 4 — {STEPS_LABELS[step - 1] || ''}</div>
-                            <button onClick={handleClose} aria-label="Cerrar" style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#999' }}>✕</button>
+                            <button onClick={handleClose} aria-label="Cerrar" style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
                         </div>
 
                         <div style={{ padding: '20px 24px' }}>
                             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
                                 {[1, 2, 3, 4].map(s => (
-                                    <div key={s} style={{ flex: 1, height: '4px', borderRadius: '2px', background: step >= s ? '#00b48a' : '#eee', transition: 'background 0.3s' }} />
+                                    <div key={s} style={{ flex: 1, height: '4px', borderRadius: '2px', background: step >= s ? '#008060' : '#eee', transition: 'background 0.3s' }} />
                                 ))}
                             </div>
 
@@ -341,10 +341,10 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                         <div style={{ display: 'flex', justifycontent: 'space-between', marginBottom: '8px', fontSize: '14px' }}><span style={{ color: '#666' }}>Horarios</span><strong>{selectedSlots.map(s => `${formatHora(s.Hora_Inicio)}-${formatHora(s.Hora_Fin)}`).join(', ')}</strong></div>
                                         <div style={{ display: 'flex', justifycontent: 'space-between', fontWeight: 'bold', borderTop: '1px solid #ddd', paddingTop: '8px' }}>
                                             <span>Total a Pagar</span>
-                                            <strong style={{ color: '#00b48a', fontSize: '16px' }}>S/ {totalPrecio.toFixed(2)}</strong>
+                                            <strong style={{ color: '#008060', fontSize: '16px' }}>S/ {totalPrecio.toFixed(2)}</strong>
                                         </div>
                                     </div>
-                                    <button onClick={() => setStep(2)} style={{ width: '100%', background: '#00b48a', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>Continuar al Pago →</button>
+                                    <button onClick={() => setStep(2)} style={{ width: '100%', background: '#008060', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>Continuar al Pago →</button>
                                 </>
                             )}
 
@@ -361,7 +361,7 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                     </div>
                                     <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                                         <button onClick={() => setStep(1)} style={{ flex: 1, background: '#eee', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>← Atrás</button>
-                                        <button onClick={() => setStep(3)} disabled={!formData.nombre.trim() || !formData.telefono.trim()} style={{ flex: 1, background: formData.nombre.trim() && formData.telefono.trim() ? '#00b48a' : '#ccc', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: formData.nombre.trim() && formData.telefono.trim() ? 'pointer' : 'not-allowed', fontSize: '14px' }}>Continuar →</button>
+                                        <button onClick={() => setStep(3)} disabled={!formData.nombre.trim() || !formData.telefono.trim()} style={{ flex: 1, background: formData.nombre.trim() && formData.telefono.trim() ? '#008060' : '#ccc', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: formData.nombre.trim() && formData.telefono.trim() ? 'pointer' : 'not-allowed', fontSize: '14px' }}>Continuar →</button>
                                     </div>
                                 </>
                             )}
@@ -371,18 +371,18 @@ const CanchaDetail = ({ onOpenLogin }) => {
                                     <h4 style={{ marginBottom: '16px' }}>Método de pago</h4>
                                     <div style={{ background: '#f8f9fa', borderRadius: '10px', padding: '14px', marginBottom: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <span style={{ color: '#666', fontSize: '14px' }}>Total a pagar ahora</span>
-                                        <span style={{ fontSize: '20px', fontWeight: 800, color: '#00b48a' }}>S/ {totalPrecio.toFixed(2)}</span>
+                                        <span style={{ fontSize: '20px', fontWeight: 800, color: '#008060' }}>S/ {totalPrecio.toFixed(2)}</span>
                                     </div>
                                     <div style={{ marginBottom: '16px' }}>
-                                        <label htmlFor="pago-culqi" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px', borderRadius: '10px', border: selectedPago === 'culqi' ? '2px solid #00b48a' : '1px solid #ddd', background: selectedPago === 'culqi' ? '#e6f8f4' : 'white', cursor: 'pointer', transition: 'all 0.15s' }}>
-                                            <input id="pago-culqi" type="radio" name="pago" checked={selectedPago === 'culqi'} onChange={() => setSelectedPago('culqi')} style={{ accentColor: '#00b48a' }} />
+                                        <label htmlFor="pago-culqi" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px', borderRadius: '10px', border: selectedPago === 'culqi' ? '2px solid #008060' : '1px solid #ddd', background: selectedPago === 'culqi' ? '#e6f8f4' : 'white', cursor: 'pointer', transition: 'all 0.15s' }}>
+                                            <input id="pago-culqi" type="radio" name="pago" checked={selectedPago === 'culqi'} onChange={() => setSelectedPago('culqi')} style={{ accentColor: '#008060' }} />
                                             <span style={{ fontSize: '18px' }}>💳</span>
                                             <span style={{ fontWeight: selectedPago === 'culqi' ? 'bold' : 'normal', fontSize: '14px' }}>Tarjeta / Culqi</span>
                                         </label>
                                     </div>
                                     <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
                                         <button type="button" onClick={handleClose} style={{ background: '#eee', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', flex: 1, fontSize: '14px' }}>Cancelar</button>
-                                        <button type="submit" disabled={isLoading} style={{ flex: 2, background: '#00b48a', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '15px' }}>
+                                        <button type="submit" disabled={isLoading} style={{ flex: 2, background: '#008060', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer', fontSize: '15px' }}>
                                             {isLoading ? 'Procesando...' : `🔒 Pagar S/ ${totalPrecio.toFixed(2)}`}
                                         </button>
                                     </div>
@@ -391,15 +391,15 @@ const CanchaDetail = ({ onOpenLogin }) => {
 
                             {step === 4 && (
                                 <div style={{ textAlign: 'center', padding: '10px 0' }}>
-                                    <div style={{ fontSize: '52px', marginBottom: '12px', color: '#00b48a' }}>✓</div>
+                                    <div style={{ fontSize: '52px', marginBottom: '12px', color: '#008060' }}>✓</div>
                                     <h4 style={{ fontSize: '22px', fontWeight: 800, marginBottom: '6px' }}>¡Reserva confirmada!</h4>
                                     <p style={{ color: '#666', marginBottom: '6px', fontSize: '14px' }}>
                                         {cancha.Nombre} — {fechaSeleccionada()}
                                     </p>
-                                    <p style={{ color: '#888', marginBottom: '20px', fontSize: '13px' }}>
+                                    <p style={{ color: '#6b7280', marginBottom: '20px', fontSize: '13px' }}>
                                         {selectedSlots.map(s => `${formatHora(s.Hora_Inicio)}-${formatHora(s.Hora_Fin)}`).join(', ')}
                                     </p>
-                                    <button onClick={handleClose} style={{ width: '100%', background: '#00b48a', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>Mis Reservas →</button>
+                                    <button onClick={handleClose} style={{ width: '100%', background: '#008060', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px' }}>Mis Reservas →</button>
                                 </div>
                             )}
                         </div>

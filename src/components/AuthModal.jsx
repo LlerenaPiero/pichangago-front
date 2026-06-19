@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { authService } from '../services/authService'; 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -17,6 +17,13 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -82,7 +89,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
     <div role="dialog" aria-modal="true" aria-label={authMode === 'forgot' ? 'Recuperar contraseña' : authMode === 'register' ? 'Registrarse' : 'Iniciar sesión'} style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}>
       <div style={{ background: 'white', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '420px', position: 'relative', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
         
-        <button onClick={onClose} aria-label="Cerrar modal" style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#9ca3af' }}>✕</button>
+        <button onClick={onClose} aria-label="Cerrar modal" style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
 
         <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '24px', color: '#0f172a' }}>
           {authMode === 'forgot' ? 'Recuperar Contraseña' : 'Acceder a PichangaGo'}
@@ -94,14 +101,14 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
             <button 
               type="button"
               onClick={() => { setAuthMode('login'); setErrorMessage(''); setSuccessMessage(''); setIsBlocked(false); }} 
-              style={{ flex: 1, paddingBottom: '12px', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: authMode === 'login' ? '#00b48a' : '#64748b', borderBottom: authMode === 'login' ? '2px solid #00b48a' : 'none' }}
+              style={{ flex: 1, paddingBottom: '12px', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: authMode === 'login' ? '#008060' : '#475569', borderBottom: authMode === 'login' ? '2px solid #008060' : 'none' }}
             >
               Ingresar
             </button>
             <button 
               type="button"
               onClick={() => { setAuthMode('register'); setErrorMessage(''); setSuccessMessage(''); setIsBlocked(false); }} 
-              style={{ flex: 1, paddingBottom: '12px', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: authMode === 'register' ? '#00b48a' : '#64748b', borderBottom: authMode === 'register' ? '2px solid #00b48a' : 'none' }}
+              style={{ flex: 1, paddingBottom: '12px', background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: authMode === 'register' ? '#008060' : '#475569', borderBottom: authMode === 'register' ? '2px solid #008060' : 'none' }}
             >
               Registrarse
             </button>
@@ -111,10 +118,10 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
     
         {authMode === 'register' && (
           <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
-            <button type="button" onClick={() => setRole('JUGADOR')} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: role === 'JUGADOR' ? '2px solid #00b48a' : '1px solid #e2e8f0', backgroundColor: role === 'JUGADOR' ? '#e6f8f4' : 'white', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
+            <button type="button" onClick={() => setRole('JUGADOR')} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: role === 'JUGADOR' ? '2px solid #008060' : '1px solid #e2e8f0', backgroundColor: role === 'JUGADOR' ? '#e6f8f4' : 'white', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
               ⚽ Soy Jugador
             </button>
-            <button type="button" onClick={() => setRole('DUENO')} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: role === 'DUENO' ? '2px solid #00b48a' : '1px solid #e2e8f0', backgroundColor: role === 'DUENO' ? '#e6f8f4' : 'white', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
+            <button type="button" onClick={() => setRole('DUENO')} style={{ flex: 1, padding: '10px', borderRadius: '10px', cursor: 'pointer', border: role === 'DUENO' ? '2px solid #008060' : '1px solid #e2e8f0', backgroundColor: role === 'DUENO' ? '#e6f8f4' : 'white', fontWeight: 600, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
               🏟️ Soy Dueño
             </button>
           </div>
@@ -122,8 +129,8 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
 
         <div aria-live="polite" aria-atomic="true" role="status" style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>{errorMessage || successMessage}</div>
         {errorMessage && (
-          <div role="alert" style={{ backgroundColor: '#fee2e2', color: '#dc2626', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: 'bold', border: '1px solid #fca5a5' }}>
-            ⚠️ {errorMessage}
+          <div role="alert" style={{ backgroundColor: '#fef2f2', color: '#b91c1c', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.9em', textAlign: 'center', fontWeight: 'bold', border: '1px solid #fca5a5' }}>
+            {errorMessage}
           </div>
         )}
         {successMessage && (
@@ -166,14 +173,14 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
                 {authMode === 'login' && (
                   <span 
                     onClick={() => { setAuthMode('forgot'); setErrorMessage(''); setSuccessMessage(''); setIsBlocked(false); }}
-                    style={{ fontSize: '13px', color: '#00b48a', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{ fontSize: '13px', color: '#008060', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     ¿Olvidaste tu contraseña?
                   </span>
                 )}
               </div>
               <input id="auth-password" type="password" placeholder="••••••••" required aria-required="true" title="Mínimo 6 caracteres" aria-describedby="auth-pwd-help" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }} />
-              {authMode === 'register' && <span id="auth-pwd-help" style={{ fontSize: '11px', color: '#888' }}>Mínimo 6 caracteres</span>}
+              {authMode === 'register' && <span id="auth-pwd-help" style={{ fontSize: '11px', color: '#6b7280' }}>Mínimo 6 caracteres</span>}
             </div>
           )}
 

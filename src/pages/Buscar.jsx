@@ -126,15 +126,15 @@ const Buscar = () => {
             ) : error ? (
                 <div style={{ textAlign: 'center', padding: '60px', color: 'red' }}>❌ {error}</div>
             ) : canchas.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#999' }}>
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
                     <p style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</p>
                     <p style={{ fontSize: '18px', marginBottom: '4px' }}>No se encontraron canchas con esos filtros.</p>
                     <p style={{ fontSize: '13px', marginBottom: '16px', color: '#aaa' }}>Intentá con otros términos o limpiá los filtros.</p>
-                    <button onClick={limpiarFiltros} style={{ background: '#00b48a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Limpiar filtros</button>
+                    <button onClick={limpiarFiltros} style={{ background: '#008060', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Limpiar filtros</button>
                 </div>
             ) : (
                 <>
-                    <p style={{ color: '#888', marginBottom: '16px', fontSize: '13px' }}>{canchas.length} cancha(s) encontrada(s)</p>
+                    <p style={{ color: '#6b7280', marginBottom: '16px', fontSize: '13px' }}>{canchas.length} cancha(s) encontrada(s)</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {canchas.map(cancha => (
                             <Link key={cancha.ID_Cancha} to={`/cancha/${cancha.ID_Cancha}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -155,7 +155,7 @@ const Buscar = () => {
                                             <div>
                                                 <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 700, color: '#1e2530' }}>{SportIcon({ tipo: cancha.Tipo_Deporte })} {cancha.Nombre}</h3>
                                                 <p style={{ margin: '0 0 2px 0', color: '#666', fontSize: '13px' }}>📍 {cancha.Direccion} — {cancha.Distrito}</p>
-                                                <p style={{ margin: '0 0 6px 0', color: '#888', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '400px' }}>{cancha.Descripcion || 'Cancha deportiva'}</p>
+                                                <p style={{ margin: '0 0 6px 0', color: '#6b7280', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '400px' }}>{cancha.Descripcion || 'Cancha deportiva'}</p>
                                             </div>
                                             {cancha.Rating > 0 && (
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#fffbeb', padding: '4px 10px', borderRadius: '20px', border: '1px solid #fde68a', fontSize: '13px', fontWeight: 'bold', color: '#92400e', whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -164,10 +164,10 @@ const Buscar = () => {
                                             )}
                                         </div>
                                         <div style={{ display: 'flex', gap: '16px', marginTop: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                                            <span style={{ fontWeight: 'bold', fontSize: '17px', color: '#00b48a' }}>S/ {cancha.Precio_Base?.toFixed(2)} <span style={{ fontSize: '12px', color: '#888', fontWeight: 'normal' }}>/ hora</span></span>
-                                            {cancha.Precio_Baja && cancha.Precio_Baja !== cancha.Precio_Base && <span style={{ fontSize: '12px', color: '#888' }}>🌅 Baja: S/ {Number(cancha.Precio_Baja).toFixed(2)}</span>}
-                                            {cancha.Precio_Prime && cancha.Precio_Prime !== cancha.Precio_Base && <span style={{ fontSize: '12px', color: '#888' }}>⭐ Prime: S/ {Number(cancha.Precio_Prime).toFixed(2)}</span>}
-                                            {cancha.Fotos?.length > 1 && <span style={{ fontSize: '12px', color: '#888' }}>📷 {cancha.Fotos.length}</span>}
+                                            <span style={{ fontWeight: 'bold', fontSize: '17px', color: '#008060' }}>S/ {cancha.Precio_Base?.toFixed(2)} <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 'normal' }}>/ hora</span></span>
+                                            {cancha.Precio_Baja && cancha.Precio_Baja !== cancha.Precio_Base && <span style={{ fontSize: '12px', color: '#6b7280' }}>🌅 Baja: S/ {Number(cancha.Precio_Baja).toFixed(2)}</span>}
+                                            {cancha.Precio_Prime && cancha.Precio_Prime !== cancha.Precio_Base && <span style={{ fontSize: '12px', color: '#6b7280' }}>⭐ Prime: S/ {Number(cancha.Precio_Prime).toFixed(2)}</span>}
+                                            {cancha.Fotos?.length > 1 && <span style={{ fontSize: '12px', color: '#6b7280' }}>📷 {cancha.Fotos.length}</span>}
                                         </div>
                                     </div>
                                 </div>

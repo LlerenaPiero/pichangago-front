@@ -50,7 +50,7 @@ const Home = () => {
 
         <div className="search-bar">
           <input type="text" placeholder="Buscar por nombre o dirección…" value={searchNombre} onChange={e => setSearchNombre(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleBuscar()} />
-          <select value={searchDistrito} onChange={e => setSearchDistrito(e.target.value)}>
+          <select aria-label="Distrito" value={searchDistrito} onChange={e => setSearchDistrito(e.target.value)}>
             <option value="">Todos los distritos</option>
             {DISTRITOS.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
@@ -143,9 +143,9 @@ const Home = () => {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#999' }}>Cargando canchas...</div>
+          <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>Cargando canchas...</div>
         ) : canchas.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#999' }}>
+          <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
             <p>No hay canchas disponibles en este momento.</p>
           </div>
         ) : (

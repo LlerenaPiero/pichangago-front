@@ -20,7 +20,7 @@ export default function ReportesDueno({ onMensaje }) {
                         const idx = tabs.indexOf(tabReporte);
                         if (e.key === 'ArrowRight') { e.preventDefault(); setTabReporte(tabs[(idx + 1) % tabs.length]); }
                         if (e.key === 'ArrowLeft') { e.preventDefault(); setTabReporte(tabs[(idx - 1 + tabs.length) % tabs.length]); }
-                    }} style={{ padding: '10px 16px', background: 'none', border: 'none', borderBottom: tabReporte === tab.key ? '3px solid #00b48a' : 'none', fontWeight: 'bold', cursor: 'pointer', color: tabReporte === tab.key ? '#00b48a' : '#666', fontSize: '14px' }}>{tab.label}</button>
+                    }} style={{ padding: '10px 16px', background: 'none', border: 'none', borderBottom: tabReporte === tab.key ? '3px solid #008060' : 'none', fontWeight: 'bold', cursor: 'pointer', color: tabReporte === tab.key ? '#008060' : '#666', fontSize: '14px' }}>{tab.label}</button>
                 ))}
             </div>
 
@@ -71,7 +71,7 @@ function ReporteIngresos({ onMensaje }) {
                         <ResumenCard label="Reservas Realizadas" value={data.total_reservas} color="#3b82f6" subtitle={`En el período seleccionado`} />
                         <ResumenCard label="Total Ingresos (Bruto)" value={`S/${parseFloat(data.total_ingresos || 0).toFixed(2)}`} color="#22c55e" subtitle="Suma de montos pagados" />
                         <ResumenCard label="Comisiones PichangaGO" value={`S/${parseFloat(data.total_comisiones || 0).toFixed(2)}`} color="#ef4444" subtitle={data.total_reservas > 0 ? `~S/${(parseFloat(data.total_comisiones || 0) / data.total_reservas).toFixed(2)} por reserva` : ''} />
-                        <ResumenCard label="Neto a Recibir" value={`S/${parseFloat(data.total_neto || 0).toFixed(2)}`} color="#00b48a" subtitle="Ingresos − Comisiones" />
+                        <ResumenCard label="Neto a Recibir" value={`S/${parseFloat(data.total_neto || 0).toFixed(2)}`} color="#008060" subtitle="Ingresos − Comisiones" />
                     </div>
 
                     {data.reservas && data.reservas.length > 0 ? (
@@ -102,7 +102,7 @@ function ReporteIngresos({ onMensaje }) {
                             </table>
                         </div>
                     ) : (
-                        <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>No hay reservas en este período.</p>
+                        <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>No hay reservas en este período.</p>
                     )}
                 </>
             )}
@@ -122,8 +122,8 @@ function ReporteSaldoPendiente() {
         })();
     }, []);
 
-    if (loading) return <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>Cargando...</p>;
-    if (!data) return <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>No hay datos disponibles.</p>;
+    if (loading) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Cargando...</p>;
+    if (!data) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>No hay datos disponibles.</p>;
 
     return (
         <div>
@@ -148,7 +148,7 @@ function ReporteSaldoPendiente() {
                         <div><strong>Período:</strong><br />{new Date(data.liquidacion_pendiente.periodo.inicio).toLocaleDateString('es-PE')} — {new Date(data.liquidacion_pendiente.periodo.fin).toLocaleDateString('es-PE')}</div>
                         <div><strong>Monto Bruto (reservas):</strong><br />S/{parseFloat(data.liquidacion_pendiente.monto_bruto || 0).toFixed(2)}</div>
                         <div><strong>Comisión PichangaGO:</strong><br /><span style={{ color: '#dc2626' }}>-S/{parseFloat(data.liquidacion_pendiente.comision_pgo || 0).toFixed(2)}</span></div>
-                        <div><strong>Neto a Transferir:</strong><br /><span style={{ fontWeight: 'bold', color: '#00b48a', fontSize: '20px' }}>S/{parseFloat(data.liquidacion_pendiente.monto_neto || 0).toFixed(2)}</span></div>
+                        <div><strong>Neto a Transferir:</strong><br /><span style={{ fontWeight: 'bold', color: '#008060', fontSize: '20px' }}>S/{parseFloat(data.liquidacion_pendiente.monto_neto || 0).toFixed(2)}</span></div>
                     </div>
                 </div>
             )}
@@ -172,7 +172,7 @@ function ReporteSaldoPendiente() {
                 <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '14px', fontSize: '14px' }}>
                     📅 <strong>Fecha estimada de transferencia:</strong>{' '}
                     {new Date(data.fecha_estimada_transferencia + 'T12:00:00').toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    <span style={{ display: 'block', fontSize: '12px', color: '#888', marginTop: '4px' }}>El dinero se depositará en tu cuenta registrada (CCI) en esta fecha.</span>
+                    <span style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>El dinero se depositará en tu cuenta registrada (CCI) en esta fecha.</span>
                 </div>
             )}
         </div>
@@ -191,8 +191,8 @@ function ReporteLiquidaciones() {
         })();
     }, []);
 
-    if (loading) return <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>Cargando...</p>;
-    if (!data || data.length === 0) return <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>No hay liquidaciones registradas.</p>;
+    if (loading) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Cargando...</p>;
+    if (!data || data.length === 0) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>No hay liquidaciones registradas.</p>;
 
     return (
         <div>
@@ -218,7 +218,7 @@ function ReporteLiquidaciones() {
                                 <td style={{ padding: '8px', border: '1px solid #ddd' }}>{new Date(liq.Fecha_Inicio).toLocaleDateString('es-PE')} - {new Date(liq.Fecha_Fin).toLocaleDateString('es-PE')}</td>
                                 <td style={{ padding: '8px', border: '1px solid #ddd' }}>S/{parseFloat(liq.Monto_Bruto || 0).toFixed(2)}</td>
                                 <td style={{ padding: '8px', border: '1px solid #ddd', color: '#dc2626' }}>-S/{parseFloat(liq.Comision_PGO || 0).toFixed(2)}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold', color: '#00b48a' }}>S/{parseFloat(liq.Monto_Neto || 0).toFixed(2)}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold', color: '#008060' }}>S/{parseFloat(liq.Monto_Neto || 0).toFixed(2)}</td>
                                 <td style={{ padding: '8px', border: '1px solid #ddd' }}>{liq.Fecha_Transf ? new Date(liq.Fecha_Transf).toLocaleDateString('es-PE') : '—'}</td>
                                 <td style={{ padding: '8px', border: '1px solid #ddd' }}><span style={{ padding: '3px 8px', borderRadius: '12px', background: liq.Estado === 'PAGADA' ? '#d4edda' : '#fff3cd', color: liq.Estado === 'PAGADA' ? '#155724' : '#856404', fontWeight: 'bold', fontSize: '12px' }}>{liq.Estado === 'PAGADA' ? '✅ Pagada' : '⏳ Pendiente'}</span></td>
                             </tr>
@@ -296,21 +296,21 @@ function ReporteOcupacion() {
                         {data.por_dia_semana && data.por_dia_semana.length > 0 && (
                             <div style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '18px' }}>
                                 <h4 style={{ margin: '0 0 2px', fontSize: '15px' }}>📅 Por Día de Semana</h4>
-                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#888' }}>¿Qué días se reserva más? Ajusta precios según la demanda de cada día.</p>
+                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#6b7280' }}>¿Qué días se reserva más? Ajusta precios según la demanda de cada día.</p>
                                 <BarraOcupacion data={data.por_dia_semana} labelKey="dia_nombre" />
                             </div>
                         )}
                         {data.por_franja && data.por_franja.length > 0 && (
                             <div style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '18px' }}>
                                 <h4 style={{ margin: '0 0 2px', fontSize: '15px' }}>⏰ Por Franja Horaria</h4>
-                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#888' }}>Identifica tus horas pico (más demanda) y horas valle (menos demanda) para ajustar tarifas.</p>
+                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#6b7280' }}>Identifica tus horas pico (más demanda) y horas valle (menos demanda) para ajustar tarifas.</p>
                                 <BarraOcupacion data={data.por_franja} labelKey="franja" />
                             </div>
                         )}
                         {data.por_mes && data.por_mes.length > 0 && (
                             <div style={{ border: '1px solid #e0e0e0', borderRadius: '12px', padding: '18px' }}>
                                 <h4 style={{ margin: '0 0 2px', fontSize: '15px' }}>📆 Tendencia Mensual</h4>
-                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#888' }}>Evolución de la ocupación mes a mes. Detecta temporadas altas y bajas.</p>
+                                <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#6b7280' }}>Evolución de la ocupación mes a mes. Detecta temporadas altas y bajas.</p>
                                 <BarraOcupacion data={data.por_mes} labelKey={d => `${new Date(d.anio, d.mes - 1).toLocaleString('es-PE', { month: 'short' })} ${d.anio}`} />
                             </div>
                         )}
@@ -388,8 +388,8 @@ function ReporteHistorialReservas() {
             </div>
 
             {buscado && (
-                loading ? <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>Buscando...</p> :
-                !data || data.length === 0 ? <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>No se encontraron reservas.</p> :
+                loading ? <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Buscando...</p> :
+                !data || data.length === 0 ? <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>No se encontraron reservas.</p> :
                 <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                         <thead><tr style={{ background: '#1e2530', color: 'white' }}>
@@ -426,7 +426,7 @@ function ResumenCard({ label, value, color, subtitle }) {
         <div style={{ border: `1px solid ${color}33`, borderRadius: '8px', padding: '16px', background: '#fff', textAlign: 'center' }}>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '2px' }}>{label}</div>
             <div style={{ fontSize: '20px', fontWeight: 'bold', color }}>{value}</div>
-            {subtitle && <div style={{ fontSize: '11px', color: '#999', marginTop: '4px' }}>{subtitle}</div>}
+            {subtitle && <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>{subtitle}</div>}
         </div>
     );
 }

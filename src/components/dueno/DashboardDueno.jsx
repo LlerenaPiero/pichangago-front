@@ -35,8 +35,8 @@ export default function DashboardDueno() {
         })();
     }, []);
 
-    if (loading) return <p style={{ color: '#999', textAlign: 'center', padding: '40px' }} role="status">Cargando resumen...</p>;
-    if (!dashboard) return <p style={{ color: '#999', textAlign: 'center', padding: '40px' }} role="status">No hay datos disponibles.</p>;
+    if (loading) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '40px' }} role="status">Cargando resumen...</p>;
+    if (!dashboard) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '40px' }} role="status">No hay datos disponibles.</p>;
 
     const cards = [
         { label: 'Reservas hoy', value: dashboard.reservas_hoy, icon: '📅', color: '#3b82f6' },
@@ -69,7 +69,7 @@ export default function DashboardDueno() {
                         <div style={{ fontSize: '28px', marginBottom: '6px' }}>{card.icon}</div>
                         <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px' }}>{card.label}</div>
                         <div style={{ fontSize: '26px', fontWeight: 'bold', color: card.color }}>{card.value}</div>
-                        {card.sub && <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>{card.sub}</div>}
+                        {card.sub && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>{card.sub}</div>}
                     </div>
                 ))}
             </div>
@@ -106,7 +106,7 @@ export default function DashboardDueno() {
                                         <td style={{ padding: '12px 16px' }}>{slot.CanchaNombre || '—'}</td>
                                         <td style={{ padding: '12px 16px' }}>
                                             <span style={{ fontWeight: '500' }}>👤 {slot.JugadorNombre}</span>
-                                            {slot.JugadorTelefono && <span style={{ fontSize: '12px', color: '#9ca3af', marginLeft: '8px' }}>📞 {slot.JugadorTelefono}</span>}
+                                            {slot.JugadorTelefono && <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>📞 {slot.JugadorTelefono}</span>}
                                         </td>
                                         <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: '#059669' }}>
                                             S/ {Number(slot.Monto_Total || 0).toFixed(2)}
@@ -133,13 +133,13 @@ export default function DashboardDueno() {
                 }}>
                     <div style={{ fontSize: '40px', marginBottom: '8px' }}>📭</div>
                     <p style={{ color: '#6b7280', fontWeight: '500' }}>No hay reservas para hoy</p>
-                    <p style={{ color: '#9ca3af', fontSize: '13px', margin: 0 }}>Los próximos clientes aparecerán aquí automáticamente.</p>
+                    <p style={{ color: '#6b7280', fontSize: '13px', margin: 0 }}>Los próximos clientes aparecerán aquí automáticamente.</p>
                 </div>
             )}
 
             {dashboard.proxima_liquidacion && (
                 <div style={{
-                    border: '1px solid #00b48a22', borderRadius: '12px', padding: '20px 24px',
+                    border: '1px solid #00806022', borderRadius: '12px', padding: '20px 24px',
                     background: 'linear-gradient(135deg, #f0fdfa 0%, #ecfdf5 100%)',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
                 }}>

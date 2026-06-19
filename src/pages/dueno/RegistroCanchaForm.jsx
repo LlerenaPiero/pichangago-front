@@ -92,7 +92,7 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
                 <div>
                     <label htmlFor="rcf-nombre" title={AYUDA.nombre}>📌 Nombre del Complejo:</label>
                     <input id="rcf-nombre" type="text" name="nombre" value={formData.nombre} required aria-required="true" onChange={handleChange} placeholder="Ej: Cancha Los Olivos" title={AYUDA.nombre} aria-describedby="rcf-nombre-help" style={{ width: '100%', marginBottom: '10px', padding: '6px' }} />
-                    <span id="rcf-nombre-help" style={{ fontSize: '11px', color: '#888', display: 'block', marginTop: '-8px', marginBottom: '10px' }}>{AYUDA.nombre}</span>
+                    <span id="rcf-nombre-help" style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginTop: '-8px', marginBottom: '10px' }}>{AYUDA.nombre}</span>
                 </div>
                 <div>
                     <label htmlFor="rcf-descripcion" title={AYUDA.descripcion}>📝 Descripción:</label>
@@ -110,26 +110,26 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
                     <div style={{ flex: 1 }}>
                         <label htmlFor="rcf-precioBase" title={AYUDA.precioBase}>💰 Precio Base (S/):</label>
                         <input id="rcf-precioBase" type="number" min={1} name="precioBase" value={formData.precioBase} required aria-required="true" onChange={handleChange} placeholder="Ej: 70" title={AYUDA.precioBase} aria-describedby="rcf-pbase-help" style={{ width: '100%', padding: '6px' }} />
-                        <span id="rcf-pbase-help" style={{ fontSize: '11px', color: '#888' }}>Horario normal (12-17hrs)</span>
+                        <span id="rcf-pbase-help" style={{ fontSize: '11px', color: '#6b7280' }}>Horario normal (12-17hrs)</span>
                     </div>
                     <div style={{ flex: 1 }}>
                         <label htmlFor="rcf-precioPrime" title={AYUDA.precioPrime}>⭐ Precio Prime (S/):</label>
                         <input id="rcf-precioPrime" type="number" min={1} name="precioPrime" value={formData.precioPrime} onChange={handleChange} placeholder="Opcional" title={AYUDA.precioPrime} aria-describedby="rcf-pprime-help" style={{ width: '100%', padding: '6px' }} />
-                        <span id="rcf-pprime-help" style={{ fontSize: '11px', color: '#888' }}>Noches/Finde (18-22hrs)</span>
+                        <span id="rcf-pprime-help" style={{ fontSize: '11px', color: '#6b7280' }}>Noches/Finde (18-22hrs)</span>
                     </div>
                 </div>
                 <div style={{ marginBottom: '10px' }}>
                     <label htmlFor="rcf-precioBaja" title={AYUDA.precioBaja}>🟡 Precio Baja (S/):</label>
                     <input id="rcf-precioBaja" type="number" min={1} name="precioBaja" value={formData.precioBaja} onChange={handleChange} placeholder="Opcional" title={AYUDA.precioBaja} aria-describedby="rcf-pbaja-help" style={{ width: '100%', padding: '6px' }} />
-                    <span id="rcf-pbaja-help" style={{ fontSize: '11px', color: '#888' }}>Mañanas (antes 12hrs)</span>
+                    <span id="rcf-pbaja-help" style={{ fontSize: '11px', color: '#6b7280' }}>Mañanas (antes 12hrs)</span>
                 </div>
                 <div>
                     <label htmlFor="rcf-foto" title={AYUDA.foto} style={{ fontWeight: 'bold' }}>📷 Foto de la Cancha <span style={{ color: 'red' }}>*</span>:</label>
                     <input id="rcf-foto" type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handleFileChange} required aria-required="true" aria-describedby="rcf-foto-help" style={{ width: '100%', marginBottom: '4px', padding: '4px' }} />
-                    <span id="rcf-foto-help" style={{ fontSize: '11px', color: '#888' }}>JPG/PNG/WebP/AVIF — Máx 5MB</span>
-                    {fotoFile && <p style={{ fontSize: '12px', color: '#00b48a', marginTop: '4px', marginBottom: '15px' }}>✅ {fotoFile.name}</p>}
+                    <span id="rcf-foto-help" style={{ fontSize: '11px', color: '#6b7280' }}>JPG/PNG/WebP/AVIF — Máx 5MB</span>
+                    {fotoFile && <p style={{ fontSize: '12px', color: '#008060', marginTop: '4px', marginBottom: '15px' }}>✅ {fotoFile.name}</p>}
                 </div>
-                <button type="submit" disabled={enviando} style={{ background: enviando ? '#ccc' : '#00b48a', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '5px', cursor: enviando ? 'not-allowed' : 'pointer', width: '100%', fontWeight: 'bold', marginTop: '10px' }}>
+                <button type="submit" disabled={enviando} style={{ background: enviando ? '#ccc' : '#008060', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '5px', cursor: enviando ? 'not-allowed' : 'pointer', width: '100%', fontWeight: 'bold', marginTop: '10px' }}>
                     {enviando ? 'Registrando...' : 'Guardar Cancha y Continuar'}
                 </button>
             </form>

@@ -121,7 +121,7 @@ const ResetPassword = () => {
             <button 
               type="submit" 
               disabled={isLoading} 
-              style={{ width: '100%', padding: '14px', borderRadius: '10px', border: 'none', backgroundColor: '#00b48a', color: 'white', fontWeight: 700, cursor: 'pointer', marginTop: '10px', fontSize: '16px' }}
+              style={{ width: '100%', padding: '14px', borderRadius: '10px', border: 'none', backgroundColor: '#008060', color: 'white', fontWeight: 700, cursor: 'pointer', marginTop: '10px', fontSize: '16px' }}
             >
               {isLoading ? 'Actualizando...' : 'Guardar y Entrar ⚽'}
             </button>

@@ -252,9 +252,9 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                         <button key={tab} role="tab" aria-selected={gestionSubTab === tab} onClick={() => setGestionSubTab(tab)}
                             style={{
                                 padding: '10px 18px', background: gestionSubTab === tab ? '#f0fdfa' : 'transparent',
-                                border: 'none', borderBottom: gestionSubTab === tab ? '3px solid #00b48a' : '3px solid transparent',
+                                border: 'none', borderBottom: gestionSubTab === tab ? '3px solid #008060' : '3px solid transparent',
                                 fontWeight: gestionSubTab === tab ? 'bold' : '500',
-                                cursor: 'pointer', color: gestionSubTab === tab ? '#00b48a' : '#666',
+                                cursor: 'pointer', color: gestionSubTab === tab ? '#008060' : '#666',
                                 fontSize: '14px', borderRadius: '6px 6px 0 0', transition: 'all 0.15s'
                             }}>
                             {tab === 'info' ? '✏️ Información' : tab === 'horarios' ? '📅 Horarios' : tab === 'fotos' ? '📷 Fotos' : '⭐ Reviews'}
@@ -265,8 +265,8 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                 {/* SUBTAB: INFORMACIÓN */}
                 {gestionSubTab === 'info' && editandoCancha && (
                     <form onSubmit={handleEditarCanchaSubmit}>
-                        <div style={{ marginBottom: '14px', padding: '12px 14px', background: '#f0fdfa', borderRadius: '8px', border: '1px solid #00b48a33' }}>
-                            <strong style={{ fontSize: '13px', color: '#00b48a' }}>🏢 {editandoCancha._localNombre}</strong>
+                        <div style={{ marginBottom: '14px', padding: '12px 14px', background: '#f0fdfa', borderRadius: '8px', border: '1px solid #00806033' }}>
+                            <strong style={{ fontSize: '13px', color: '#008060' }}>🏢 {editandoCancha._localNombre}</strong>
                             <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#666' }}>📍 {editandoCancha._localDireccion} - {editandoCancha._localDistrito}</p>
                         </div>
                         <div style={{ marginBottom: '14px' }}>
@@ -297,7 +297,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" style={{ background: '#00b48a', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '14px' }}>💾 Guardar Cambios</button>
+                        <button type="submit" style={{ background: '#008060', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '14px' }}>💾 Guardar Cambios</button>
                     </form>
                 )}
 
@@ -305,17 +305,17 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                 {gestionSubTab === 'horarios' && (
                     <div>
                         <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>Selecciona los bloques que quieras activar. Haz clic en cada celda para activar/desactivar o cambiar la tarifa.</p>
-                        <p style={{ fontSize: '12px', color: '#888', marginBottom: '15px', padding: '8px 12px', background: '#f0fdfa', borderRadius: '6px', border: '1px solid #6ee7b7' }}> Los horarios se aplican de forma semanal recurrente. Cada bloque se repite automáticamente todas las semanas.</p>
+                        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '15px', padding: '8px 12px', background: '#f0fdfa', borderRadius: '6px', border: '1px solid #6ee7b7' }}> Los horarios se aplican de forma semanal recurrente. Cada bloque se repite automáticamente todas las semanas.</p>
                         {mensajeHorario && <p style={{ color: mensajeHorario.includes('⚠') ? '#d32f2f' : '#2e7d32', fontWeight: 'bold', marginBottom: '10px', fontSize: '14px' }}>{mensajeHorario}</p>}
 
                         {cargandoHorarios ? (
-                            <p style={{ color: '#999', marginBottom: '15px' }}>Cargando horarios...</p>
+                            <p style={{ color: '#6b7280', marginBottom: '15px' }}>Cargando horarios...</p>
                         ) : (
                             <div style={{ position: 'relative' }}>
                                 {guardando && (
                                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, borderRadius: '8px' }}>
                                         <div style={{ textAlign: 'center', padding: '20px' }}>
-                                            <div className="loader" style={{ borderColor: '#00b48a33', borderTopColor: '#00b48a', width: '32px', height: '32px', borderWidth: '3px', margin: '0 auto 12px' }} />
+                                            <div className="loader" style={{ borderColor: '#00806033', borderTopColor: '#008060', width: '32px', height: '32px', borderWidth: '3px', margin: '0 auto 12px' }} />
                                             <p style={{ fontWeight: 'bold', color: '#333', fontSize: '14px' }}>Guardando horarios...</p>
                                         </div>
                                     </div>
@@ -343,7 +343,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                         <input type="time" disabled={guardando} value={qfDesde} onChange={e => setQfDesde(e.target.value)} style={{ width: '80px', padding: '3px', fontSize: '12px' }} />
                                         <span>a</span>
                                         <input type="time" disabled={guardando} value={qfHasta} onChange={e => setQfHasta(e.target.value)} style={{ width: '80px', padding: '3px', fontSize: '12px' }} />
-                                        <select disabled={guardando} value={qfTipoPrecio} onChange={e => setQfTipoPrecio(e.target.value)} style={{ padding: '3px', fontSize: '12px' }}>
+                                        <select aria-label="Tipo de precio" disabled={guardando} value={qfTipoPrecio} onChange={e => setQfTipoPrecio(e.target.value)} style={{ padding: '3px', fontSize: '12px' }}>
                                             <option value="BASE">Base</option>
                                             <option value="PRIME">Prime</option>
                                             <option value="BAJA">Baja</option>
@@ -398,7 +398,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                     <span style={{ fontWeight: 'bold', color: '#555' }}>Activos: {Object.keys(gridState).length} bloques</span>
                                 </div>
 
-                                <button disabled={guardando} onClick={guardarHorarios} style={{ background: guardando ? '#ccc' : '#00b48a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', width: '100%' }}>
+                                <button disabled={guardando} onClick={guardarHorarios} style={{ background: guardando ? '#ccc' : '#008060', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: guardando ? 'not-allowed' : 'pointer', width: '100%' }}>
                                     {guardando ? '⏳ Guardando...' : '💾 Guardar Horarios'}
                                 </button>
                             </div>
@@ -410,7 +410,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                 {gestionSubTab === 'reviews' && (
                     <div>
                         {reviewsLoading ? (
-                            <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>Cargando reviews...</p>
+                            <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Cargando reviews...</p>
                         ) : reviews && reviews.reviews && reviews.reviews.length > 0 ? (
                             <>
                                 <div style={{ display: 'flex', gap: '16px', marginBottom: '16px', alignItems: 'center' }}>
@@ -428,13 +428,13 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                                 <span style={{ fontSize: '16px' }}>{'⭐'.repeat(Math.min(r.Calificacion || 0, 5))}</span>
                                             </div>
                                             {r.Comentarios && <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>{r.Comentarios}</p>}
-                                            <span style={{ fontSize: '11px', color: '#999', marginTop: '6px', display: 'block' }}>{new Date(r.Fecha_Crea).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                            <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px', display: 'block' }}>{new Date(r.Fecha_Crea).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                         </div>
                                     ))}
                                 </div>
                             </>
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '30px', color: '#999' }}>
+                            <div style={{ textAlign: 'center', padding: '30px', color: '#6b7280' }}>
                                 <p style={{ fontSize: '32px', marginBottom: '8px' }}>⭐</p>
                                 <p>Aún no hay reviews para esta cancha.</p>
                             </div>
@@ -459,7 +459,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                         ) : (
                             <div style={{ textAlign: 'center', padding: '30px 20px', background: '#f9fafb', borderRadius: '10px', marginBottom: '20px' }}>
                                 <p style={{ fontSize: '28px', marginBottom: '6px', opacity: 0.4 }}>📷</p>
-                                <p style={{ color: '#999', fontSize: '13px' }}>No hay fotos registradas.</p>
+                                <p style={{ color: '#6b7280', fontSize: '13px' }}>No hay fotos registradas.</p>
                             </div>
                         )}
                         <div style={{ border: '2px dashed #ddd', borderRadius: '10px', padding: '20px', textAlign: 'center', background: '#fafafa' }}>
@@ -475,7 +475,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                     setEditFotoFile(file);
                                 }
                             }} style={{ marginBottom: '8px' }} />
-                            <p style={{ fontSize: '11px', color: '#888' }}>JPG / PNG / WebP / AVIF — Máx 5 MB</p>
+                            <p style={{ fontSize: '11px', color: '#6b7280' }}>JPG / PNG / WebP / AVIF — Máx 5 MB</p>
                             {editFotoFile && (
                                 <button onClick={async () => {
                                     if (!editandoCancha) return;
@@ -493,7 +493,7 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                     } else {
                                         onMensaje(`❌ ${formatValidationErrors(res)}`);
                                     }
-                                }} style={{ background: '#00b48a', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', marginTop: '10px', fontSize: '13px' }}>📤 Subir {editFotoFile.name}</button>
+                                }} style={{ background: '#008060', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', marginTop: '10px', fontSize: '13px' }}>📤 Subir {editFotoFile.name}</button>
                             )}
                         </div>
                     </div>

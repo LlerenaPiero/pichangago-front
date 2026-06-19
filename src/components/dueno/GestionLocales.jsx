@@ -72,13 +72,13 @@ export default function GestionLocales({ onMensaje }) {
         setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' });
     };
 
-    if (loading) return <p style={{ color: '#999', textAlign: 'center', padding: '20px' }}>Cargando locales...</p>;
+    if (loading) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Cargando locales...</p>;
 
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h3>🏢 Mis Locales ({locales.length})</h3>
-                <button onClick={() => { setMostrarForm(true); setEditandoId(null); setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' }); }} style={{ background: '#00b48a', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>➕ Nuevo Local</button>
+                <button onClick={() => { setMostrarForm(true); setEditandoId(null); setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' }); }} style={{ background: '#008060', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>➕ Nuevo Local</button>
             </div>
 
             {locales.length === 0 ? (
@@ -94,7 +94,7 @@ export default function GestionLocales({ onMensaje }) {
                                 <div>
                                     <h4 style={{ margin: '0 0 6px 0', fontSize: '18px' }}>🏢 {loc.Nombre}</h4>
                                     <p style={{ margin: '0 0 4px 0', color: '#666', fontSize: '14px' }}>📍 {loc.Direccion} - {loc.Distrito}</p>
-                                    {loc.Referencia && <p style={{ margin: '0 0 4px 0', color: '#999', fontSize: '13px' }}>📍 Ref: {loc.Referencia}</p>}
+                                    {loc.Referencia && <p style={{ margin: '0 0 4px 0', color: '#6b7280', fontSize: '13px' }}>📍 Ref: {loc.Referencia}</p>}
                                     <span style={{ fontSize: '12px', padding: '3px 8px', borderRadius: '12px', background: loc.Estado === 'ACTIVO' ? '#d4edda' : '#fee2e2', color: loc.Estado === 'ACTIVO' ? 'green' : 'red', fontWeight: 'bold' }}>{loc.Estado}</span>
                                 </div>
                                 <button onClick={() => abrirEditar(loc.ID_Local)} style={{ background: '#1e2530', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>✏️ Editar</button>
@@ -142,7 +142,7 @@ export default function GestionLocales({ onMensaje }) {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                                 <button type="button" onClick={cerrarForm} style={{ background: '#eee', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>Cancelar</button>
-                                <button type="submit" disabled={enviando} style={{ background: enviando ? '#ccc' : '#00b48a', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer' }}>
+                                <button type="submit" disabled={enviando} style={{ background: enviando ? '#ccc' : '#008060', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: enviando ? 'not-allowed' : 'pointer' }}>
                                     {enviando ? 'Guardando...' : (editandoId ? '💾 Guardar Cambios' : 'Guardar')}
                                 </button>
                             </div>

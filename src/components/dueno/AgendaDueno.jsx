@@ -263,7 +263,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
             <div key={slot.ID_Slots} style={CARD_STYLES.slotRow}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>{color.label}</span>
-                <span style={{ fontSize: '12px', color: '#999', marginLeft: 'auto' }}>{slot.EstadoSlot}</span>
+                <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: 'auto' }}>{slot.EstadoSlot}</span>
             </div>
         );
     };
@@ -308,11 +308,11 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                 <div style={{ marginBottom: '20px', border: '2px solid #ffc107', borderRadius: '10px', padding: '20px', background: '#fffbe6' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
                         <h4 style={{ margin: 0 }}>🔥 Crear Ofertas Relámpago</h4>
-                        <button onClick={() => setOfertaMulti({ ...ofertaMulti, visible: false })} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#999' }}>✕</button>
+                        <button onClick={() => setOfertaMulti({ ...ofertaMulti, visible: false })} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6b7280' }}>✕</button>
                     </div>
                     <div style={{ marginBottom: '12px' }}>
-                        <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Cancha:</label>
-                        <select value={ofertaMulti.cancha} onChange={e => setOfertaMulti({ ...ofertaMulti, cancha: e.target.value, slots: [] })} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
+                        <label htmlFor="agenda-cancha-oferta" style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Cancha:</label>
+                        <select id="agenda-cancha-oferta" value={ofertaMulti.cancha} onChange={e => setOfertaMulti({ ...ofertaMulti, cancha: e.target.value, slots: [] })} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}>
                             <option value="">-- Seleccionar --</option>
                             {[...new Set(slots.filter(s => s.EstadoSlot === 'DISPONIBLE').map(s => s.CanchaNombre || 'Cancha'))].map(n => (
                                 <option key={n} value={n}>{n}</option>
@@ -322,7 +322,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                     <div style={{ marginBottom: '12px' }}>
                         <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>Slots disponibles para oferta:</label>
                         {slots.filter(s => (s.CanchaNombre || 'Cancha') === ofertaMulti.cancha && s.EstadoSlot === 'DISPONIBLE').length === 0 ? (
-                            <p style={{ color: '#999', fontSize: '13px' }}>No hay slots disponibles en esta cancha.</p>
+                            <p style={{ color: '#6b7280', fontSize: '13px' }}>No hay slots disponibles en esta cancha.</p>
                         ) : (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                 {slots.filter(s => (s.CanchaNombre || 'Cancha') === ofertaMulti.cancha && s.EstadoSlot === 'DISPONIBLE').map(s => {
@@ -345,7 +345,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                         <div style={{ flex: 1, minWidth: '120px' }}>
                             <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>📉 % Descuento:</label>
                             <input type="number" min={1} max={50} value={ofertaMulti.porcentaje} onChange={e => /^\d*$/.test(e.target.value) && setOfertaMulti({ ...ofertaMulti, porcentaje: e.target.value })} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }} />
-                            <span style={{ fontSize: '11px', color: '#888' }}>Entre 1% y 50%</span>
+                            <span style={{ fontSize: '11px', color: '#6b7280' }}>Entre 1% y 50%</span>
                         </div>
                         <div style={{ flex: 1, minWidth: '120px' }}>
                             <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>📅 Válido hasta:</label>
@@ -380,7 +380,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                     </div>
 
                     {cargandoSemanal ? (
-                        <p style={{ textAlign: 'center', color: '#999', padding: '40px' }} role="status">Cargando vista semanal...</p>
+                        <p style={{ textAlign: 'center', color: '#6b7280', padding: '40px' }} role="status">Cargando vista semanal...</p>
                     ) : errorSemanal ? (
                         <div style={{ textAlign: 'center', padding: '30px', color: '#d32f2f' }}>
                             <p>❌ {errorSemanal}</p>
@@ -423,11 +423,11 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                                     <div key={dia.fecha} style={CARD_STYLES.card}>
                                         <div role="button" tabIndex={0} aria-expanded={expandida} aria-label={`${expandida ? 'Colapsar' : 'Expandir'} día ${new Date(dia.fecha + 'T12:00:00').toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}`} style={CARD_STYLES.header} onClick={() => toggleDiaExpandido(dia.fecha)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDiaExpandido(dia.fecha); } }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                                <span style={{ fontSize: '12px', color: '#999', transition: 'transform 0.2s', transform: expandida ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                                                <span style={{ fontSize: '12px', color: '#6b7280', transition: 'transform 0.2s', transform: expandida ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
                                                 <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', color: '#1e2530' }}>
                                                     {new Date(dia.fecha + 'T12:00:00').toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}
                                                 </h4>
-                                                <span style={{ fontSize: '12px', color: '#888' }}>({totalDia} slots)</span>
+                                                <span style={{ fontSize: '12px', color: '#6b7280' }}>({totalDia} slots)</span>
                                             </div>
                                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', fontSize: '11px' }}>
                                                 {dStats.disponibles > 0 && <span style={{ color: '#166534', fontWeight: 'bold' }}>✅{dStats.disponibles}</span>}
@@ -440,7 +440,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                                         {expandida && (
                                             <div style={CARD_STYLES.body}>
                                                 {(!dia.canchas || dia.canchas.length === 0) ? (
-                                                    <p style={{ padding: '14px 18px', color: '#999', fontSize: '13px', margin: 0 }}>Sin horarios para este día.</p>
+                                                    <p style={{ padding: '14px 18px', color: '#6b7280', fontSize: '13px', margin: 0 }}>Sin horarios para este día.</p>
                                                 ) : (
                                                     dia.canchas.map(cancha => {
                                                         const canchaRel = canchas.find(cc => cc.Nombre === cancha.Nombre || cc.ID_Cancha === cancha.ID_Cancha);
@@ -481,7 +481,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                             </div>
                         </>
                     ) : (
-                        <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>No hay datos para esta semana.</p>
+                        <p style={{ textAlign: 'center', color: '#6b7280', padding: '40px' }}>No hay datos para esta semana.</p>
                     )}
                 </div>
             ) : (
@@ -498,11 +498,11 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
 
                     {/* Filters */}
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '16px', alignItems: 'center' }}>
-                        <select value={filtroCancha} onChange={e => setFiltroCancha(e.target.value)} style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', background: '#fff' }}>
+                        <select aria-label="Filtrar por cancha" value={filtroCancha} onChange={e => setFiltroCancha(e.target.value)} style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', background: '#fff' }}>
                             <option value="">Todas las canchas</option>
                             {canchaNombres.map(n => <option key={n} value={n}>{n}</option>)}
                         </select>
-                        <select value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)} style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', background: '#fff' }}>
+                        <select aria-label="Filtrar por estado" value={filtroEstado} onChange={e => setFiltroEstado(e.target.value)} style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #ccc', fontSize: '13px', background: '#fff' }}>
                             {STATUS_FILTERS.map(sf => <option key={sf.value} value={sf.value}>{sf.label}</option>)}
                         </select>
                         {(filtroCancha || filtroEstado) && (
@@ -514,15 +514,15 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
 
                     {/* Loading */}
                     {cargando ? (
-                        <p style={{ textAlign: 'center', color: '#999', padding: '40px', fontSize: '14px' }} role="status">Cargando agenda...</p>
+                        <p style={{ textAlign: 'center', color: '#6b7280', padding: '40px', fontSize: '14px' }} role="status">Cargando agenda...</p>
                     ) : slots.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#999' }}>
+                        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6b7280' }}>
                             <p style={{ fontSize: '40px', marginBottom: '10px' }}>📅</p>
                             <p style={{ fontSize: '16px' }}>No hay horarios generados para este día.</p>
                             <p style={{ fontSize: '13px', marginTop: '4px' }}>Usa la pestaña "Canchas" para configurar los horarios de tus canchas.</p>
                         </div>
                     ) : Object.keys(slotsPorCancha).length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                        <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
                             <p>No hay slots que coincidan con los filtros seleccionados.</p>
                         </div>
                     ) : (
@@ -535,9 +535,9 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                                 <div key={nombreCancha} style={CARD_STYLES.card}>
                                     <div role="button" tabIndex={0} aria-expanded={expandida} aria-label={`${expandida ? 'Colapsar' : 'Expandir'} cancha ${nombreCancha}`} style={CARD_STYLES.header} onClick={() => toggleExpandida(nombreCancha)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpandida(nombreCancha); } }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: '12px', color: '#999', transition: 'transform 0.2s', transform: expandida ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                                            <span style={{ fontSize: '12px', color: '#6b7280', transition: 'transform 0.2s', transform: expandida ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
                                             <h4 style={CARD_STYLES.headerTitle}>🏟️ {nombreCancha}</h4>
-                                            <span style={{ fontSize: '12px', color: '#888', fontWeight: 'normal' }}>({slotsCancha.length} slots)</span>
+                                            <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 'normal' }}>({slotsCancha.length} slots)</span>
                                         </div>
                                         {canchaRel && (
                                             <button onClick={(e) => { e.stopPropagation(); onAbrirGestionCancha(canchaRel); }} title="Gestionar horarios"

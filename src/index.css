@@ -8,13 +8,13 @@
   --gray1:   #F7F8FA;
   --gray2:   #EDF0F4;
   --gray3:   #C8CDD6;
-  --gray4:   #8A93A2;
+  --gray4:   #6b7280;
   --dark1:   #0D1117;
   --dark2:   #161B25;
   --dark3:   #1E2535;
   --dark4:   #2A3345;
   --text:    #1A2033;
-  --textMid: #5A6478;
+  --textMid: #475569;
   --white:   #FFFFFF;
   --prime:   #7B5CF5;
   
@@ -180,7 +180,7 @@ textarea:focus-visible {
 
 .cancha-price { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--dark1); }
 .cancha-price small { font-size: 12px; color: var(--textMid); font-weight: 400; }
-.cancha-rating { font-size: 13px; font-weight: 600; color: var(--amber); }
+.cancha-rating { font-size: 13px; font-weight: 600; color: #8A6A00; }
 
 /* --- ESTILOS DEL NAVBAR --- */
 .navbar {
@@ -279,14 +279,14 @@ textarea:focus-visible {
 .detail-nombre { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--dark1); margin-bottom: 8px; }
 .detail-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .detail-amenidades { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; margin-bottom: 16px;}
-.amenidad { padding: 5px 12px; background: var(--gray2); border-radius: 20px; font-size: 12px; color: var(--textMid); font-weight: 500;}
+.amenidad { padding: 5px 12px; background: var(--gray2); border-radius: 20px; font-size: 12px; color: #1F2937; font-weight: 500;}
 
 .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600; letter-spacing: .3px; }
-.badge-green { background: #E6FAF3; color: #00875A; }
-.badge-gray { background: var(--gray2); color: var(--textMid); }
-.badge-amber { background: #FFF5D6; color: #B87700; }
-.badge-red { background: #FFEDED; color: #CC2200; }
-.badge-prime { background: #F0ECFF; color: var(--prime); }
+.badge-green { background: #E6FAF3; color: #006644; }
+.badge-gray { background: #E2E5EB; color: #1F2937; }
+.badge-amber { background: #FFF5D6; color: #8A5A00; }
+.badge-red { background: #FFEDED; color: #A01A00; }
+.badge-prime { background: #F0ECFF; color: #5B3EE8; }
 
 .precios-tabla { background: var(--gray1); border-radius: var(--r12); padding: 16px; border: 1px solid var(--gray2); margin-top: 16px; text-align: left; }
 .precio-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--gray2); }
@@ -326,7 +326,7 @@ textarea:focus-visible {
 .slot.oferta { background: #FFFBEB; border-color: #FFD066; color: var(--dark1); }
 
 .slot-tag { position: absolute; top: -7px; right: 4px; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 6px; }
-.slot-tag.prime { background: var(--prime); color: #fff; }
+.slot-tag.prime { background: #5B3EE8; color: #fff; }
 .slot-tag.oferta { background: var(--amber); color: var(--dark1); }
 
 .adelanto-info { background: var(--dark1); border-radius: var(--r12); padding: 16px; margin-bottom: 16px; text-align: left; }

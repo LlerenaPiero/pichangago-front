@@ -61,9 +61,9 @@ export default function DuenoOnboarding() {
         <div style={{ padding: '80px 24px', fontFamily: 'Arial, sans-serif' }}>
             {/* Indicador visual de pasos */}
             <div style={{ display: 'flex', justifyContent: 'space-around', background: '#f0f4f8', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-                <span style={{ fontWeight: paso === 1 ? 'bold' : 'normal', color: paso === 1 ? '#00b48a' : '#999' }}>1. Registrar Cancha</span>
-                <span style={{ fontWeight: paso === 2 ? 'bold' : 'normal', color: paso === 2 ? '#00b48a' : '#999' }}>2. Configurar Cobros</span>
-                <span style={{ fontWeight: paso === 3 ? 'bold' : 'normal', color: paso === 3 ? '#00b48a' : '#999' }}>3. Asignar Horarios y Tarifas</span>
+                <span style={{ fontWeight: paso === 1 ? 'bold' : 'normal', color: paso === 1 ? '#008060' : '#999' }}>1. Registrar Cancha</span>
+                <span style={{ fontWeight: paso === 2 ? 'bold' : 'normal', color: paso === 2 ? '#008060' : '#999' }}>2. Configurar Cobros</span>
+                <span style={{ fontWeight: paso === 3 ? 'bold' : 'normal', color: paso === 3 ? '#008060' : '#999' }}>3. Asignar Horarios y Tarifas</span>
             </div>
 
             {/* RENDERIZADO DINÁMICO */}
@@ -99,7 +99,7 @@ export default function DuenoOnboarding() {
                             <input id="ob-horaInicio" type="time" value={nuevoHorario.horaInicio} onChange={e => setNuevoHorario({...nuevoHorario, horaInicio: e.target.value})} style={{ padding: '4px' }} aria-describedby="ob-rango-help" /> 
                             <span> a </span>
                             <input id="ob-horaFin" type="time" value={nuevoHorario.horaFin} onChange={e => setNuevoHorario({...nuevoHorario, horaFin: e.target.value})} style={{ padding: '4px' }} />
-                            <span id="ob-rango-help" style={{ fontSize: '11px', color: '#888', display: 'block' }}>Hora inicio — Hora fin</span>
+                            <span id="ob-rango-help" style={{ fontSize: '11px', color: '#6b7280', display: 'block' }}>Hora inicio — Hora fin</span>
                         </div>
                         <div>
                             <label htmlFor="ob-tarifa">Tarifa aplicable:</label>
@@ -135,7 +135,7 @@ export default function DuenoOnboarding() {
                         </tbody>
                     </table>
 
-                    <button onClick={guardarTodoElCronograma} style={{ background: '#00b48a', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '5px', cursor: 'pointer', width: '100%', fontWeight: 'bold', fontSize: '16px' }}>
+                    <button onClick={guardarTodoElCronograma} style={{ background: '#008060', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '5px', cursor: 'pointer', width: '100%', fontWeight: 'bold', fontSize: '16px' }}>
                         🚀 Finalizar Onboarding y Publicar Cancha
                     </button>
                 </div>

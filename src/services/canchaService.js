@@ -27,6 +27,9 @@ export const canchaService = {
     return res.json();
   },
 
+
+
+  
   // ⚽ FUNCIÓN DE RESERVA INYECTADA Y CONECTADA A TU BACKEND:
   reservarCancha: async (datosReserva) => {
     const res = await apiFetch('/api/canchas/reservar', {
@@ -35,5 +38,15 @@ export const canchaService = {
       body: JSON.stringify(datosReserva)
     });
     return res.json();
+  },
+
+
+  
+  obtenerMisReservas: async () => {
+    const res = await apiFetch('/api/jugador/reservas', { method: 'GET' });
+    return res.json();
   }
+
+
+  
 };

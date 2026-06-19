@@ -25,5 +25,15 @@ export const canchaService = {
   obtenerOfertasHoy: async () => {
     const res = await apiFetch('/api/canchas/ofertas-hoy');
     return res.json();
+  },
+
+  // ⚽ FUNCIÓN DE RESERVA INYECTADA Y CONECTADA A TU BACKEND:
+  reservarCancha: async (datosReserva) => {
+    const res = await apiFetch('/api/canchas/reservar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datosReserva)
+    });
+    return res.json();
   }
 };

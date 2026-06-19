@@ -1,6 +1,17 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const authService = {
+  
+  
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('usuario');
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch (e) {
+      return null;
+    }
+  },
   register: async (nombre, apellido, email, password, rol, telefono = '') => {
     try {
       const response = await fetch(`${API_URL}/api/register`, {

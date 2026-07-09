@@ -3,24 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { canchaService } from '../services/canchaService';
 import { getImageUrl } from '../utils/imageUrl';
 
-const DISTRITOS = ['San Juan de Miraflores', 'Santiago de Surco', 'Los Olivos', 'La Victoria', 'Chorrillos', 'San Borja', 'Miraflores', 'Magdalena del Mar', 'Barranco'];
-const formatearFecha = (date) => {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
-};
-
-const hoy = () => formatearFecha(new Date());
-
-const fechaLabel = (dateStr) => {
-  const d = new Date(dateStr + 'T00:00:00');
-  const hoyDate = new Date();
-  hoyDate.setHours(0, 0, 0, 0);
-  const diffTime = d.getTime() - hoyDate.getTime();
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return 'Hoy';
-  if (diffDays === 1) return 'Mañana';
-  return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
-};
+const hoy = () => new Date().toISOString().split('T')[0];
 
 const Home = () => {
   const [canchas, setCanchas] = useState([]);
@@ -30,17 +13,33 @@ const Home = () => {
   const [ubicacion, setUbicacion] = useState('');
   const [fecha, setFecha] = useState(hoy());
   const [hora, setHora] = useState('');
+  const [coords, setCoords] = useState(null);
   
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      const res = await canchaService.listarCanchas();
+      const filtros = {};
+      if (coords) {
+        filtros.lat = coords.lat;
+        filtros.lng = coords.lng;
+      }
+      const res = await canchaService.listarCanchas(filtros);
       if (res.status === 'success') {
         setCanchas(res.data || []);
       }
       setLoading(false);
     })();
+  }, [coords]);
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => setLoading(false),
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -63,11 +62,6 @@ const Home = () => {
 
   const fotoUrl = (cancha) => getImageUrl(cancha.Fotos?.[0]?.URL_Foto);
 
-  const redondearRating = (rating) => {
-    if (!rating || rating <= 0) return null;
-    return Math.round(rating * 10) / 10;
-  };
-
   return (
     <div className="home-container">
       {/* HERO */}
@@ -76,29 +70,31 @@ const Home = () => {
         <p>Elige horario, paga con Yape y recibe confirmaci&oacute;n inmediata.</p>
 
         <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Ciudad / distrito / cancha"
-            value={ubicacion}
-            onChange={e => setUbicacion(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleBuscar()}
-            aria-label="Ubicaci&oacute;n"
-          />
-          <input
-            type="date"
-            value={fecha}
-            onChange={e => setFecha(e.target.value)}
-            aria-label="Fecha"
-            className="search-date"
-          />
-          <input
-            type="time"
-            value={hora}
-            onChange={e => setHora(e.target.value)}
-            aria-label="Hora"
-            className="search-time"
-          />
-          
+          <div className="search-fields">
+            <input
+              type="text"
+              placeholder="Ciudad / distrito / cancha"
+              value={ubicacion}
+              onChange={e => setUbicacion(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleBuscar()}
+              aria-label="Ubicación"
+              className="search-input-ubicacion"
+            />
+            <input
+              type="date"
+              value={fecha}
+              onChange={e => setFecha(e.target.value)}
+              aria-label="Fecha"
+              className="search-input-date"
+            />
+            <input
+              type="time"
+              value={hora}
+              onChange={e => setHora(e.target.value)}
+              aria-label="Hora (opcional)"
+              className="search-input-time"
+            />
+          </div>
           <button className="btn-search" onClick={handleBuscar}>
             Buscar disponibles
           </button>
@@ -210,7 +206,7 @@ const Home = () => {
           </div>
         ) : (
           <div className="cards-grid">
-            {canchas.slice(0, 6).map((cancha) => {
+            {canchas.map((cancha) => {
               const r = ratingRedondeado(cancha);
               return (
                 <Link

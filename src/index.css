@@ -92,42 +92,69 @@ textarea:focus-visible {
 
 .search-bar {
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  max-width: 580px;
+  max-width: 640px;
   margin: 0 auto;
   background: var(--dark2);
-  border-radius: var(--r12);
-  padding: 8px;
+  border-radius: var(--r16);
+  padding: 10px;
   border: 1px solid var(--dark4);
+}
+
+.search-fields {
+  display: flex;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.search-bar input, .search-bar select {
+.search-fields input {
   flex: 1;
-  background: transparent;
-  border: none;
+  min-width: 140px;
+  background: var(--dark3);
+  border: 1px solid var(--dark4);
+  border-radius: var(--r10, 10px);
   color: var(--white);
-  font-size: 15px;
-  padding: 8px 12px;
+  font-size: 14px;
+  padding: 10px 14px;
   outline: none;
-  min-width: 150px;
+  transition: border-color 0.2s;
 }
 
-.search-bar select {
-  background: var(--dark3);
-  border-radius: var(--r8);
-  color: var(--gray3);
+.search-fields input:focus {
+  border-color: var(--green);
+}
+
+.search-fields input::placeholder {
+  color: var(--gray4);
+}
+
+.search-input-ubicacion {
+  flex: 2;
+  min-width: 200px;
+}
+
+.search-input-date,
+.search-input-time {
+  flex: 0 0 auto;
+  min-width: 130px;
+}
+
+.search-input-time:not(:focus):placeholder-shown {
+  color: var(--gray4);
 }
 
 .btn-search {
   background: var(--green);
   color: var(--dark1);
   border: none;
-  padding: 10px 22px;
-  border-radius: var(--r8);
-  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--r12);
+  font-weight: 700;
+  font-size: 15px;
   cursor: pointer;
   transition: 0.2s;
+  width: 100%;
 }
 
 .btn-search:hover { background: var(--green2); }
@@ -937,6 +964,20 @@ textarea:focus-visible {
 }
 
 @media (max-width: 700px) {
+  .search-fields {
+    flex-direction: column;
+  }
+
+  .search-fields input {
+    min-width: 100%;
+  }
+
+  .search-input-ubicacion,
+  .search-input-date,
+  .search-input-time {
+    min-width: 100%;
+  }
+
   .trust-badges {
     flex-direction: column;
     align-items: center;
@@ -957,12 +998,5 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
     text-align: center;
     gap: 24px;
-  }
-
-  .search-bar .search-date,
-  .search-bar .search-time,
-  .search-bar .search-tipo {
-    flex: 1;
-    min-width: 140px;
   }
 }

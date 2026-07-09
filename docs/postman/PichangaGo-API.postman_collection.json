@@ -1,0 +1,755 @@
+{
+  "info": {
+    "name": "PichangaGo API",
+    "description": "Colección completa de endpoints para PichangaGo.\n\nFlujo típico:\n1. Pide un token con POST /api/login (usuario: ana@test.com, clave: Clave@123)\n2. La colección guarda automáticamente el token en la variable {{token}}\n3. El resto de endpoints lo usan en el header Authorization\n\nAntes de empezar, configura:\n- Variable {{baseUrl}} → http://localhost:5000 (o la URL de tu backend)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"López\",\n  \"email\": \"carlos@test.com\",\n  \"password\": \"Clave@123\",\n  \"rol\": \"jugador\",\n  \"telefono\": \"999888777\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "register"]
+            }
+          }
+        },
+        {
+          "name": "Iniciar sesión (jugador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "  pm.collectionVariables.set('userId', json.usuario?._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jugador@test.com\",\n  \"password\": \"Clave@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Iniciar sesión (dueño)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "  pm.collectionVariables.set('userId', json.usuario?._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dueno@test.com\",\n  \"password\": \"Clave@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Refrescar token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.accessToken) {",
+                  "  pm.collectionVariables.set('token', json.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Validar sesión",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/validate-session",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "validate-session"]
+            }
+          }
+        },
+        {
+          "name": "Health / Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "status"]
+            }
+          }
+        },
+        {
+          "name": "Olvidé contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jugador@test.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Resetear contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-ejemplo\",\n  \"newPassword\": \"NuevaClave@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reset-password"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚽ Canchas (Público)",
+      "item": [
+        {
+          "name": "Listar canchas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas"]
+            }
+          }
+        },
+        {
+          "name": "Buscar canchas (filtros)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas?distrito=Miraflores&nombre=&precioMin=0&precioMax=200",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas"],
+              "query": [
+                { "key": "distrito", "value": "Miraflores" },
+                { "key": "nombre", "value": "" },
+                { "key": "precioMin", "value": "0" },
+                { "key": "precioMax", "value": "200" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detalle de cancha",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas/{{canchaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas", "{{canchaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Slots disponibles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas/{{canchaId}}/slots?fecha={{fecha}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas", "{{canchaId}}", "slots"],
+              "query": [
+                { "key": "fecha", "value": "{{fecha}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ofertas del día",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas/ofertas-hoy",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas", "ofertas-hoy"]
+            }
+          }
+        },
+        {
+          "name": "Reservar cancha",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"canchaId\": \"{{canchaId}}\",\n  \"slotId\": \"{{slotId}}\",\n  \"fecha\": \"{{fecha}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/canchas/reservar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "canchas", "reservar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Mis Reservas (Jugador)",
+      "item": [
+        {
+          "name": "Ver mis reservas",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/jugador/reservas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "jugador", "reservas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Dueño — Perfil",
+      "item": [
+        {
+          "name": "Obtener perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "perfil"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Nombre\": \"Ana\",\n  \"Apellido\": \"Martínez\",\n  \"Telefono\": \"999888776\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "perfil"]
+            }
+          }
+        },
+        {
+          "name": "Obtener perfil financiero",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/perfil-financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "perfil-financiero"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar perfil financiero",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Ruc\": \"12345678901\",\n  \"Razon_Social\": \"Ana Martínez SAC\",\n  \"CCI\": \"12345678901234567890\",\n  \"Banco\": \"BCP\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/perfil-financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "perfil-financiero"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏢 Dueño — Locales",
+      "item": [
+        {
+          "name": "Listar locales",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/locales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "locales"]
+            }
+          }
+        },
+        {
+          "name": "Crear local",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Nombre\": \"Nuevo Local\",\n  \"Direccion\": \"Av. Nueva 456\",\n  \"Distrito\": \"San Isidro\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/locales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "locales"]
+            }
+          }
+        },
+        {
+          "name": "Detalle de local",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/locales/{{localId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "locales", "{{localId}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar local",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Nombre\": \"Sport Center Editado\",\n  \"Direccion\": \"Av. Principal 123\",\n  \"Distrito\": \"Miraflores\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/locales/{{localId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "locales", "{{localId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏟️ Dueño — Canchas CRUD",
+      "item": [
+        {
+          "name": "Listar canchas (dueño)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas"]
+            }
+          }
+        },
+        {
+          "name": "Detalle de cancha (dueño)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado cancha",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}", "estado"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⏰ Dueño — Horarios y Slots",
+      "item": [
+        {
+          "name": "Ver horarios de cancha",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}", "horarios"]
+            }
+          }
+        },
+        {
+          "name": "Guardar horarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"horarios\": [\n    { \"Dia_Semana\": 0, \"Fecha_Inicio\": \"10:00\", \"Fecha_Fin\": \"11:00\", \"Tipo_Precio\": \"BASE\", \"Estado\": \"ACTIVO\" },\n    { \"Dia_Semana\": 1, \"Fecha_Inicio\": \"08:00\", \"Fecha_Fin\": \"22:00\", \"Tipo_Precio\": \"BASE\", \"Estado\": \"ACTIVO\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}", "horarios"]
+            }
+          }
+        },
+        {
+          "name": "Generar slots",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}/slots/generar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}", "slots", "generar"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📅 Dueño — Agenda",
+      "item": [
+        {
+          "name": "Agenda diaria",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/agenda/diaria?fecha={{fecha}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "agenda", "diaria"],
+              "query": [
+                { "key": "fecha", "value": "{{fecha}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Agenda semanal",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/agenda/semanal?fecha_inicio={{fecha}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "agenda", "semanal"],
+              "query": [
+                { "key": "fecha_inicio", "value": "{{fecha}}" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dueño — Dashboard",
+      "item": [
+        {
+          "name": "Obtener dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📈 Dueño — Reportes",
+      "item": [
+        {
+          "name": "Ingresos por período",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/reportes/ingresos?fecha_inicio=2026-06-01&fecha_fin=2026-06-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "reportes", "ingresos"],
+              "query": [
+                { "key": "fecha_inicio", "value": "2026-06-01" },
+                { "key": "fecha_fin", "value": "2026-06-30" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Saldo pendiente",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/reportes/saldo-pendiente",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "reportes", "saldo-pendiente"]
+            }
+          }
+        },
+        {
+          "name": "Liquidaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/reportes/liquidaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "reportes", "liquidaciones"]
+            }
+          }
+        },
+        {
+          "name": "Ocupación por mes",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/reportes/ocupacion?mes=6&anio=2026",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "reportes", "ocupacion"],
+              "query": [
+                { "key": "mes", "value": "6" },
+                { "key": "anio", "value": "2026" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Dueño — Reviews",
+      "item": [
+        {
+          "name": "Ver reviews de cancha",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dueno/canchas/{{canchaId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dueno", "canchas", "{{canchaId}}", "reviews"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "canchaId",
+      "value": "cancha-dueno-1",
+      "type": "string"
+    },
+    {
+      "key": "localId",
+      "value": "local-1",
+      "type": "string"
+    },
+    {
+      "key": "slotId",
+      "value": "slot-1",
+      "type": "string"
+    },
+    {
+      "key": "fecha",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

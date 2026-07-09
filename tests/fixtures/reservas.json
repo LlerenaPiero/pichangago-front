@@ -1,0 +1,28 @@
+[
+  {
+    "_id": "reserva-1",
+    "canchaId": "cancha-1",
+    "canchaNombre": "Cancha Central",
+    "usuarioId": "user-carlos",
+    "usuarioNombre": "Carlos López",
+    "fecha": "2026-06-20",
+    "horaInicio": "14:00",
+    "horaFin": "15:00",
+    "precio": 80,
+    "estado": "confirmada",
+    "codigoReserva": "RES-001"
+  },
+  {
+    "_id": "reserva-2",
+    "canchaId": "cancha-2",
+    "canchaNombre": "Los Olivos Sport",
+    "usuarioId": "user-carlos",
+    "usuarioNombre": "Carlos López",
+    "fecha": "2026-06-21",
+    "horaInicio": "16:00",
+    "horaFin": "17:00",
+    "precio": 60,
+    "estado": "pendiente",
+    "codigoReserva": "RES-002"
+  }
+]

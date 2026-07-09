@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "cancha-1",
+    "nombre": "Cancha Central",
+    "distrito": "Miraflores",
+    "direccion": "Av. Principal 123",
+    "tipoCancha": "fútbol 7",
+    "precio": 80,
+    "imagen": "/img/cancha1.jpg",
+    "rating": 4.5,
+    "amenidades": ["Estacionamiento", "Vestidores", "Iluminación"],
+    "descripcion": "Cancha de césped sintético de última generación",
+    "duenoId": "dueno-1",
+    "lat": -12.123,
+    "lng": -77.123
+  },
+  {
+    "_id": "cancha-2",
+    "nombre": "Los Olivos Sport",
+    "distrito": "San Isidro",
+    "direccion": "Calle Los Deportes 456",
+    "tipoCancha": "fútbol 5",
+    "precio": 60,
+    "imagen": "/img/cancha2.jpg",
+    "rating": 4.2,
+    "amenidades": ["Estacionamiento", "Cafetería"],
+    "descripcion": "Cancha techada con iluminación LED",
+    "duenoId": "dueno-2",
+    "lat": -12.093,
+    "lng": -77.045
+  }
+]

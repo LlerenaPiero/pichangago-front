@@ -1,0 +1,30 @@
+{
+  "nuevoJugador": {
+    "name": "Juan Pérez",
+    "email": "juan@test.com",
+    "password": "Clave@123",
+    "telefono": "999888777",
+    "role": "JUGADOR"
+  },
+  "nuevoDueno": {
+    "name": "María García",
+    "email": "maria@test.com",
+    "password": "Clave@123",
+    "telefono": "999888776",
+    "role": "DUENO"
+  },
+  "existente": {
+    "name": "Carlos López",
+    "email": "carlos@test.com",
+    "password": "Clave@123",
+    "role": "JUGADOR",
+    "token": "mock-jwt-token-carlos"
+  },
+  "duenoExistente": {
+    "name": "Ana Martínez",
+    "email": "ana@test.com",
+    "password": "Clave@123",
+    "role": "DUENO",
+    "token": "mock-jwt-token-ana"
+  }
+}

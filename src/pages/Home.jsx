@@ -4,8 +4,6 @@ import { canchaService } from '../services/canchaService';
 import { getImageUrl } from '../utils/imageUrl';
 
 const DISTRITOS = ['San Juan de Miraflores', 'Santiago de Surco', 'Los Olivos', 'La Victoria', 'Chorrillos', 'San Borja', 'Miraflores', 'Magdalena del Mar', 'Barranco'];
-const TIPOS = ['Fútbol 5', 'Fútbol 6', 'Fútbol 7', 'Fútbol 8', 'Fútbol 11'];
-
 const formatearFecha = (date) => {
   const d = new Date(date);
   return d.toISOString().split('T')[0];
@@ -32,7 +30,7 @@ const Home = () => {
   const [ubicacion, setUbicacion] = useState('');
   const [fecha, setFecha] = useState(hoy());
   const [hora, setHora] = useState('');
-  const [tipo, setTipo] = useState('');
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +57,7 @@ const Home = () => {
     if (ubicacion) params.append('nombre', ubicacion);
     if (fecha) params.append('fecha', fecha);
     if (hora) params.append('hora', hora);
-    if (tipo) params.append('tipo', tipo);
+    
     navigate(`/buscar?${params.toString()}`);
   };
 
@@ -100,15 +98,7 @@ const Home = () => {
             aria-label="Hora"
             className="search-time"
           />
-          <select
-            aria-label="Tipo de cancha"
-            value={tipo}
-            onChange={e => setTipo(e.target.value)}
-            className="search-tipo"
-          >
-            <option value="">Tipo de cancha</option>
-            {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
+          
           <button className="btn-search" onClick={handleBuscar}>
             Buscar disponibles
           </button>
@@ -203,7 +193,7 @@ const Home = () => {
           <div>
             <h2 className="section-title">Canchas recomendadas cerca de ti</h2>
             <p className="section-sub">
-              {loading ? 'Cargando...' : `${canchas.length} canchas disponibles`}
+              {loading ? 'Cargando...' : `Las mejores canchas para ti`}
             </p>
           </div>
         </div>

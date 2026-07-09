@@ -757,8 +757,10 @@ textarea:focus-visible {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(transparent, rgba(0,0,0,0.6));
-  padding: 40px 16px 12px;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(transparent, rgba(0,0,0,0.55));
+  padding: 40px 16px 14px;
   opacity: 0;
   transition: opacity 0.25s;
   pointer-events: none;
@@ -773,7 +775,7 @@ textarea:focus-visible {
   color: var(--dark1);
   font-weight: 700;
   font-size: 13px;
-  padding: 8px 16px;
+  padding: 8px 20px;
   border-radius: 8px;
   display: inline-block;
 }

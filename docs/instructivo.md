@@ -1,104 +1,116 @@
-# Instructivo — Vista Home (PichangaGo)
+# Instructivo — PichangaGo
 
-## Archivos involucrados
+## Arquitectura de páginas
+
+| Página | Rol |
+|---|---|
+| `/` (Home) | Capturar intención, generar confianza, preview de canchas |
+| `/buscar` | Filtrar, comparar y elegir cancha con herramientas completas |
+| `/cancha/:id` | Detalle, horarios y reserva |
+| `/mis-reservas` | Gestión del usuario |
+
+Home y `/buscar` están separados con roles distintos. El Home envía a `/buscar` con parámetros.
+
+---
+
+## Home (`/`)
+
+### Archivos involucrados
 
 - `src/pages/Home.jsx` — Componente principal
-- `src/index.css` — Estilos (hero, search-bar, trust-badges, ofertas, cards, cómo funciona)
+- `src/index.css` — Estilos
 - `src/components/Navbar.jsx` — Barra de navegación
 - `src/services/canchaService.js` — Llamadas al backend
 - `src/utils/imageUrl.js` — Utilidad para resolver URLs de imágenes
 
----
+### Flujo de carga
 
-## Flujo de carga
+1. **Geolocalización** — Al montar, se intenta obtener la ubicación del usuario. Si se obtiene, se envía `lat` y `lng` al backend para ordenar por cercanía.
+2. **Carga de canchas** — Se llama a `listarCanchas(filtros)`. La respuesta esperada: `{ status: 'success', data: [...] }`.
+3. **Carga de ofertas** — Se llama a `obtenerOfertasHoy()`. Si no hay ofertas, no se muestra la sección.
 
-1. **Geolocalización** — Al montar el componente, se intenta obtener la ubicación del usuario mediante `navigator.geolocation.getCurrentPosition`. Si se obtiene, se envía `lat` y `lng` como filtros al backend para ordenar por cercanía. Si el usuario rechaza o hay error, se cargan todas sin filtro geográfico.
+### Componentes visuales
 
-2. **Carga de canchas** — Se llama a `canchaService.listarCanchas(filtros)` donde `filtros` puede contener `lat` y `lng`. La respuesta esperada tiene `{ status: 'success', data: [...] }`. Cada cancha tiene:
-   - `ID_Cancha`, `Nombre`, `Distrito`, `Descripcion`, `Precio_Base`, `Rating`, `TotalReviews`, `Fotos[{URL_Foto}]`
-
-3. **Carga de ofertas** — Se llama a `canchaService.obtenerOfertasHoy()`. La respuesta esperada tiene `{ status: 'success', data: [...] }`. Si no hay ofertas o hay error, no se muestra la sección.
-
----
-
-## Componentes visuales
-
-### 1. Hero (barra de búsqueda)
+#### 1. Hero + buscador rápido
 
 ```
-Título: "Reserva una cancha cerca de ti"
-Subtítulo: "Elige horario, paga con Yape y recibe confirmación inmediata."
+Reserva una cancha cerca de ti
+Elige horario, paga con Yape y recibe confirmación inmediata.
 
-Campos:
-  [Ubicación (text)]  [Fecha (date)]  [Hora (time)]  [Buscar disponibles (btn)]
+[Ubicación (text)] [Fecha (date)] [Hora (time)] [Buscar disponibles (btn)]
 ```
 
-- **Ubicación**: texto libre (ciudad, distrito o nombre de cancha). Se envía como `nombre` en la URL.
-- **Fecha**: selector de fecha nativo. Default: hoy. Se envía como `fecha`.
-- **Hora**: selector de hora nativo. Opcional. Se envía como `hora`.
-- **Botón "Buscar disponibles"**: navega a `/buscar?nombre=...&fecha=...&hora=...`.
+- **Ubicación**: texto libre → se envía como `nombre`
+- **Fecha**: date picker, default hoy → se envía como `fecha`
+- **Hora**: opcional → se envía como `hora`
+- **Botón "Buscar disponibles"**: redirige a `/buscar?nombre=...&fecha=...&hora=...`
 
-### 2. Trust badges
+No tiene filtros avanzados (precio, ordenar, rating, tipo). Eso está en `/buscar`.
 
-Tres badges debajo del buscador como señales de confianza:
-- Disponibilidad actualizada
-- Pago con Yape
-- Comprobante inmediato
+#### 2. Trust badges
 
-### 3. Ofertas de último minuto
+Tres badges: Disponibilidad actualizada · Pago con Yape · Comprobante inmediato
 
-Sección que **solo se muestra si `ofertas.length > 0`**. Si el array está vacío, no se renderiza nada (ni título, ni caja, ni esqueleto).
+#### 3. Sección dinámica
 
-Cada oferta es una card horizontal con scroll:
-- Imagen, distrito, nombre, horario, precio original (tachado), precio oferta, % descuento, minutos restantes
-- Botón "Reservar" (navega a detalle de cancha)
-- Toda la card es un `Link` a `/cancha/:id`
+- Si hay ofertas (`ofertas.length > 0`): se muestra **"Ofertas de último minuto"**
+- Si NO hay ofertas (y hay canchas): se muestra **"Disponibles hoy cerca de ti"** con 4 cards + "Ver todas las canchas"
 
-### 4. Canchas recomendadas
+La sección de ofertas nunca se muestra vacía. Si no hay datos, se reemplaza por valor.
 
-Título: "Canchas recomendadas cerca de ti"
-Subtítulo: "Las mejores canchas para ti"
+#### 4. Canchas recomendadas
 
-Se renderizan **todas** las canchas devueltas por el backend en un grid responsive. No hay límite de cards.
+Preview de **4 canchas máximo** en un grid. Debajo, un botón **"Ver todas las canchas →"** que redirige a `/buscar`.
 
 Cada card incluye:
 - Imagen
 - Distrito, nombre, descripción/tipo
 - Precio por hora
-- Rating redondeado a 1 decimal (formato: `4.2 ★ (394)`)
-- CTA "Ver horarios" que aparece al hacer hover (centrado en la base de la card)
+- Rating redondeado a 1 decimal (`4.2 ★ (394)`)
+- CTA "Ver horarios" en hover
 
-### 5. Cómo funciona
+#### 5. Cómo funciona
 
-Tres pasos horizontales (en desktop):
-1. Busca
-2. Elige horario
-3. Paga y juega
-
-En mobile se apilan verticalmente y se ocultan los divisores.
+3 pasos: Busca → Elige horario → Paga y juega
 
 ---
 
-## Geolocalización
+## Búsqueda (`/buscar`)
 
-El Home intenta obtener la ubicación del usuario de forma **no bloqueante**:
+### Archivos involucrados
 
-```js
-navigator.geolocation.getCurrentPosition(
-  (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-  () => {}, // error silencioso
-  { timeout: 5000, enableHighAccuracy: false }
-);
-```
+- `src/pages/Buscar.jsx`
+- `src/index.css`
+- `src/services/canchaService.js`
 
-Si se obtienen coordenadas, se pasan al backend en `listarCanchas({ lat, lng })`.
-El backend debe:
-1. Recibir `lat` y `lng` como query params.
-2. Calcular distancia con las canchas.
-3. Ordenar por cercanía o filtrar por un radio (ej. 10 km).
-4. Devolver las canchas ordenadas (más cercanas primero).
+### Flujo
 
-Si el usuario rechaza o hay timeout, se cargan todas sin orden geográfico.
+1. Recibe parámetros desde Home (o desde URL directa).
+2. Filtra en tiempo real con debounce de 300 ms.
+3. Muestra resultados con disponibilidad y CTA.
+
+### Filtros
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| Buscar | texto | Cancha, distrito o dirección |
+| Distrito | select | Lista de distritos de Lima |
+| Fecha | date | Default hoy |
+| Hora | select | 06:00 - 23:00, opcional |
+| Tipo de cancha | select | Fútbol 5/6/7/8/11 |
+| Precio máx | number | Opcional |
+| Ordenar | select | Recomendadas, Menor precio, Mejor valoradas, Nombre |
+
+No incluye Precio mínimo (se eliminó por ser de utilidad dudosa).
+
+### Cards de resultado
+
+Cada card incluye:
+- Imagen, nombre, ubicación
+- Tags: tipo de cancha, hora valle, hora punta
+- Rating redondeado con reseñas
+- Precio por hora
+- CTA **"Ver horarios"** (botón verde visible siempre)
 
 ---
 
@@ -106,24 +118,39 @@ Si el usuario rechaza o hay timeout, se cargan todas sin orden geográfico.
 
 | Endpoint | Método | Parámetros | Respuesta |
 |---|---|---|---|
-| `/api/canchas` | GET | `?nombre= &distrito= &precioMin= &precioMax= &lat= &lng= &fecha= &hora= &tipo=` | `{ status: 'success', data: [...] }` |
+| `/api/canchas` | GET | `nombre, distrito, precioMax, lat, lng, fecha, hora, tipo` | `{ status: 'success', data: [...] }` |
 | `/api/canchas/ofertas-hoy` | GET | — | `{ status: 'success', data: [...] }` |
 
 ---
 
 ## Estados de carga
 
-- **Canchas**: mientras `loading=true`, se muestran skeletons (4 cards grises animadas).
-- **Ofertas**: mientras `loadingOfertas=true` y no hay ofertas, se muestran 3 skeletons pequeños.
-- **Error**: si `canchas.length === 0` después de cargar, se muestra "No hay canchas disponibles en este momento."
+**Home:**
+- Canchas: 4 skeletons animados
+- Ofertas: 3 skeletons pequeños (solo si está cargando)
+- Vacío: "No hay canchas disponibles en este momento."
+
+**Buscar:**
+- 3 skeletons tipo card horizontal
+- Vacío: "No encontramos canchas con esos filtros" + botón "Restablecer filtros"
+- Error: mensaje de error del backend
 
 ---
 
-## Pendientes / Notas
+## Geolocalización
 
-- La hora en el buscador es opcional. Si no se selecciona, no se envía el parámetro.
-- El tipo de cancha se eliminó del Home porque los usuarios ajustan según los jugadores disponibles.
-- El botón "Buscar disponibles" ocupa todo el ancho en mobile.
-- La geolocalización está implementada en el backend (recibe `lat`/`lng` y ordena por cercanía mediante la fórmula del haversine), pero requiere agregar coordenadas (`Latitud`, `Longitud`) a la tabla `Local` en la BD para que el cálculo de distancia funcione correctamente. Actualmente se usa `0` como placeholder para las coordenadas de las canchas.
-- El endpoint `GET /api/canchas` ahora soporta los filtros `fecha`, `hora`, `lat` y `lng` además de los existentes. Ver la tabla de endpoints para más detalle.
-- Para desarrollo local, ejecutar `npm run dev` (usa `node --watch` para recarga automática).
+Tanto Home como Buscar pueden enviar `lat` y `lng`. El backend debe:
+1. Recibir `lat` y `lng` como query params.
+2. Calcular distancia (haversine).
+3. Ordenar por cercanía.
+4. Requiere coordenadas (`Latitud`, `Longitud`) en la tabla `Local`.
+
+---
+
+## Notas
+
+- La hora es opcional en ambos lados.
+- El tipo de cancha se eliminó del Home (los usuarios ajustan según los jugadores disponibles), pero está en `/buscar`.
+- Precio mínimo no está en ninguna de las dos páginas.
+- El botón de búsqueda en Home ocupa ancho completo en mobile.
+- Navbar: "Ver canchas" reemplazó a "Buscar canchas". "Inicio" se eliminó como botón destacado.

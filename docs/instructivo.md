@@ -1,156 +1,99 @@
-# Instructivo — PichangaGo
+# Instructivo — PichangaGo (para backend)
 
 ## Arquitectura de páginas
 
 | Página | Rol |
 |---|---|
-| `/` (Home) | Capturar intención, generar confianza, preview de canchas |
+| `/` (Home) | Capturar intención, generar confianza, mostrar todas las canchas según ubicación |
 | `/buscar` | Filtrar, comparar y elegir cancha con herramientas completas |
 | `/cancha/:id` | Detalle, horarios y reserva |
 | `/mis-reservas` | Gestión del usuario |
 
-Home y `/buscar` están separados con roles distintos. El Home envía a `/buscar` con parámetros.
+El Home envía a `/buscar` con parámetros vía URL.
 
 ---
 
-## Home (`/`)
+## Endpoints requeridos
 
-### Archivos involucrados
+### `GET /api/canchas`
 
-- `src/pages/Home.jsx` — Componente principal
-- `src/index.css` — Estilos
-- `src/components/Navbar.jsx` — Barra de navegación
-- `src/services/canchaService.js` — Llamadas al backend
-- `src/utils/imageUrl.js` — Utilidad para resolver URLs de imágenes
+Lista canchas con filtros opcionales. El frontend envía los que tenga disponibles.
 
-### Flujo de carga
-
-1. **Geolocalización** — Al montar, se intenta obtener la ubicación del usuario. Si se obtiene, se envía `lat` y `lng` al backend para ordenar por cercanía.
-2. **Carga de canchas** — Se llama a `listarCanchas(filtros)`. La respuesta esperada: `{ status: 'success', data: [...] }`.
-3. **Carga de ofertas** — Se llama a `obtenerOfertasHoy()`. Si no hay ofertas, no se muestra la sección.
-
-### Componentes visuales
-
-#### 1. Hero + buscador rápido
-
-```
-Reserva una cancha cerca de ti
-Elige horario, paga con Yape y recibe confirmación inmediata.
-
-[Ubicación (text)] [Fecha (date)] [Hora (time)] [Buscar disponibles (btn)]
-```
-
-- **Ubicación**: texto libre → se envía como `nombre`
-- **Fecha**: date picker, default hoy → se envía como `fecha`
-- **Hora**: opcional → se envía como `hora`
-- **Botón "Buscar disponibles"**: redirige a `/buscar?nombre=...&fecha=...&hora=...`
-
-No tiene filtros avanzados (precio, ordenar, rating, tipo). Eso está en `/buscar`.
-
-#### 2. Trust badges
-
-Tres badges: Disponibilidad actualizada · Pago con Yape · Comprobante inmediato
-
-#### 3. Sección dinámica
-
-- Si hay ofertas (`ofertas.length > 0`): se muestra **"Ofertas de último minuto"**
-- Si NO hay ofertas (y hay canchas): se muestra **"Disponibles hoy cerca de ti"** con 4 cards + "Ver todas las canchas"
-
-La sección de ofertas nunca se muestra vacía. Si no hay datos, se reemplaza por valor.
-
-#### 4. Canchas recomendadas
-
-Preview de **4 canchas máximo** en un grid. Debajo, un botón **"Ver todas las canchas →"** que redirige a `/buscar`.
-
-Cada card incluye:
-- Imagen
-- Distrito, nombre, descripción/tipo
-- Precio por hora
-- Rating redondeado a 1 decimal (`4.2 ★ (394)`)
-- CTA "Ver horarios" en hover
-
-#### 5. Cómo funciona
-
-3 pasos: Busca → Elige horario → Paga y juega
-
----
-
-## Búsqueda (`/buscar`)
-
-### Archivos involucrados
-
-- `src/pages/Buscar.jsx`
-- `src/index.css`
-- `src/services/canchaService.js`
-
-### Flujo
-
-1. Recibe parámetros desde Home (o desde URL directa).
-2. Filtra en tiempo real con debounce de 300 ms.
-3. Muestra resultados con disponibilidad y CTA.
-
-### Filtros
-
-| Campo | Tipo | Notas |
-|---|---|---|
-| Buscar | texto | Cancha, distrito o dirección |
-| Distrito | select | Lista de distritos de Lima |
-| Fecha | date | Default hoy |
-| Hora | select | 06:00 - 23:00, opcional |
-| Tipo de cancha | select | Fútbol 5/6/7/8/11 |
-| Precio máx | number | Opcional |
-| Ordenar | select | Recomendadas, Menor precio, Mejor valoradas, Nombre |
-
-No incluye Precio mínimo (se eliminó por ser de utilidad dudosa).
-
-### Cards de resultado
-
-Cada card incluye:
-- Imagen, nombre, ubicación
-- Tags: tipo de cancha, hora valle, hora punta
-- Rating redondeado con reseñas
-- Precio por hora
-- CTA **"Ver horarios"** (botón verde visible siempre)
-
----
-
-## Backend endpoints requeridos
-
-| Endpoint | Método | Parámetros | Respuesta |
+| Parámetro | Tipo | Desde | Ejemplo |
 |---|---|---|---|
-| `/api/canchas` | GET | `nombre, distrito, precioMax, lat, lng, fecha, hora, tipo` | `{ status: 'success', data: [...] }` |
-| `/api/canchas/ofertas-hoy` | GET | — | `{ status: 'success', data: [...] }` |
+| `nombre` | string | Home y Buscar | `?nombre=los+olivos` |
+| `distrito` | string | Buscar | `?distrito=Miraflores` |
+| `precioMax` | number | Buscar | `?precioMax=80` |
+| `fecha` | string (YYYY-MM-DD) | Home y Buscar | `?fecha=2026-07-09` |
+| `hora` | string (HH:mm) | Home y Buscar | `?hora=20:00` |
+| `tipo` | string | Buscar | `?tipo=Fútbol+7` |
+| `lat` | number | Home (geolocalización) | `?lat=-12.0464` |
+| `lng` | number | Home (geolocalización) | `?lng=-77.0428` |
+
+**Respuesta esperada:**
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "ID_Cancha": 1,
+      "Nombre": "Cancha del viernes",
+      "Distrito": "Los Olivos",
+      "Direccion": "Av. Central 123",
+      "Descripcion": "Fútbol 7 · Grass sintético",
+      "Tipo_Deporte": "Fútbol 7",
+      "Precio_Base": 70.00,
+      "Precio_Baja": 50.00,
+      "Precio_Prime": 90.00,
+      "Rating": 4.2,
+      "TotalReviews": 126,
+      "Fotos": [{ "URL_Foto": "/uploads/cancha1.jpg" }]
+    }
+  ]
+}
+```
+
+### `GET /api/canchas/ofertas-hoy`
+
+Sin parámetros. Si no hay ofertas activas, responder con `{ "status": "success", "data": [] }` (array vacío). No debe devolver error ni mensaje, el frontend oculta la sección automáticamente.
 
 ---
 
-## Estados de carga
+## Comportamiento esperado del backend
 
-**Home:**
-- Canchas: 4 skeletons animados
-- Ofertas: 3 skeletons pequeños (solo si está cargando)
-- Vacío: "No hay canchas disponibles en este momento."
+### Geolocalización
+- El frontend envía `lat` y `lng` cuando el usuario da su ubicación.
+- El backend debe calcular distancia (haversine) y ordenar las canchas de más cercana a más lejana.
+- Si no se envían `lat`/`lng`, se devuelven todas sin orden geográfico.
+- Requiere coordenadas (`Latitud`, `Longitud`) en la tabla `Local`.
 
-**Buscar:**
-- 3 skeletons tipo card horizontal
-- Vacío: "No encontramos canchas con esos filtros" + botón "Restablecer filtros"
-- Error: mensaje de error del backend
+### Filtro por fecha y hora
+- `fecha` y `hora` son opcionales. Si se envían, el backend debe cruzar con la disponibilidad real de la cancha (slots/libres).
+- Si no hay disponibilidad para ese horario, la cancha no debe aparecer en resultados.
 
----
+### Filtro por tipo de cancha
+- `tipo` acepta valores como "Fútbol 5", "Fútbol 7", "Fútbol 11", etc.
+- Debe coincidir con `Tipo_Deporte` de la cancha (o campo similar).
 
-## Geolocalización
-
-Tanto Home como Buscar pueden enviar `lat` y `lng`. El backend debe:
-1. Recibir `lat` y `lng` como query params.
-2. Calcular distancia (haversine).
-3. Ordenar por cercanía.
-4. Requiere coordenadas (`Latitud`, `Longitud`) en la tabla `Local`.
+### Orden por defecto
+- Si no se especifica `sortBy`, el backend puede ordenar por: disponibilidad > cercanía > rating > precio.
+- El frontend aplica orden local solo para precio, rating y nombre.
 
 ---
 
-## Notas
+## Lo que NUNCA debe mostrar el Home
 
-- La hora es opcional en ambos lados.
-- El tipo de cancha se eliminó del Home (los usuarios ajustan según los jugadores disponibles), pero está en `/buscar`.
-- Precio mínimo no está en ninguna de las dos páginas.
-- El botón de búsqueda en Home ocupa ancho completo en mobile.
-- Navbar: "Ver canchas" reemplazó a "Buscar canchas". "Inicio" se eliminó como botón destacado.
+- No mostrar sección "No hay ofertas disponibles" — si no hay ofertas, el frontend no renderiza nada.
+- No mostrar secciones vacías con títulos sin contenido.
+- No hay footer en el Home.
+- No hay filtros de precio mínimo, ordenar, rating ni tipo en el Home.
+
+---
+
+## Notas técnicas
+
+- El Home muestra **todas** las canchas devueltas por `GET /api/canchas` (sin límite).
+- `GET /api/canchas/ofertas-hoy` debe devolver `data: []` si no hay ofertas, nunca un error.
+- Los ratings deben venir como número (ej. `4.2`), el frontend redondea a 1 decimal.
+- `Precio_Baja` y `Precio_Prime` se muestran como "Hora valle" y "Hora punta".
+- Si `lat` y `lng` no están implementados, el frontend funciona igual (carga todo sin filtro).

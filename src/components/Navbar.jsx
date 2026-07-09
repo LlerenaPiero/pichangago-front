@@ -26,12 +26,8 @@ const Navbar = ({ user, onLogout, onOpenLogin }) => {
       </button>
 
       <div className={`nav-links ${isOpen ? 'open' : ''}`}>
-        <Link to="/" className={`nav-link ${isActive('/')}`} onClick={() => setIsOpen(false)}>
-          Inicio
-        </Link>
-
         <Link to="/buscar" className={`nav-link ${isActive('/buscar')}`} onClick={() => setIsOpen(false)}>
-          Buscar canchas
+          Ver canchas
         </Link>
 
         {!user ? (
@@ -43,7 +39,7 @@ const Navbar = ({ user, onLogout, onOpenLogin }) => {
               cursor: 'pointer', fontSize: '14px', whiteSpace: 'nowrap'
             }}
           >
-            Iniciar Sesión
+            Ingresar
           </button>
         ) : (
           <>

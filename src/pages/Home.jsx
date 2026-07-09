@@ -4,14 +4,35 @@ import { canchaService } from '../services/canchaService';
 import { getImageUrl } from '../utils/imageUrl';
 
 const DISTRITOS = ['San Juan de Miraflores', 'Santiago de Surco', 'Los Olivos', 'La Victoria', 'Chorrillos', 'San Borja', 'Miraflores', 'Magdalena del Mar', 'Barranco'];
+const TIPOS = ['Fútbol 5', 'Fútbol 6', 'Fútbol 7', 'Fútbol 8', 'Fútbol 11'];
+
+const formatearFecha = (date) => {
+  const d = new Date(date);
+  return d.toISOString().split('T')[0];
+};
+
+const hoy = () => formatearFecha(new Date());
+
+const fechaLabel = (dateStr) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  const hoyDate = new Date();
+  hoyDate.setHours(0, 0, 0, 0);
+  const diffTime = d.getTime() - hoyDate.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return 'Hoy';
+  if (diffDays === 1) return 'Mañana';
+  return d.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
+};
 
 const Home = () => {
   const [canchas, setCanchas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ofertas, setOfertas] = useState([]);
   const [loadingOfertas, setLoadingOfertas] = useState(true);
-  const [searchNombre, setSearchNombre] = useState('');
-  const [searchDistrito, setSearchDistrito] = useState('');
+  const [ubicacion, setUbicacion] = useState('');
+  const [fecha, setFecha] = useState(hoy());
+  const [hora, setHora] = useState('');
+  const [tipo, setTipo] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,88 +56,132 @@ const Home = () => {
 
   const handleBuscar = () => {
     const params = new URLSearchParams();
-    if (searchNombre) params.append('nombre', searchNombre);
-    if (searchDistrito) params.append('distrito', searchDistrito);
+    if (ubicacion) params.append('nombre', ubicacion);
+    if (fecha) params.append('fecha', fecha);
+    if (hora) params.append('hora', hora);
+    if (tipo) params.append('tipo', tipo);
     navigate(`/buscar?${params.toString()}`);
   };
 
   const fotoUrl = (cancha) => getImageUrl(cancha.Fotos?.[0]?.URL_Foto);
 
+  const redondearRating = (rating) => {
+    if (!rating || rating <= 0) return null;
+    return Math.round(rating * 10) / 10;
+  };
+
   return (
     <div className="home-container">
+      {/* HERO */}
       <div className="hero">
-        <h1>Reserva tu cancha<br /><span style={{ color: 'var(--green)' }}>en 30 segundos</span></h1>
-        <p>Disponibilidad en tiempo real · Paga con Yape · Comprobante PDF automático</p>
+        <h1>Reserva una cancha<br /><span style={{ color: 'var(--green)' }}>cerca de ti</span></h1>
+        <p>Elige horario, paga con Yape y recibe confirmaci&oacute;n inmediata.</p>
 
         <div className="search-bar">
-          <input type="text" placeholder="Buscar por nombre o dirección…" value={searchNombre} onChange={e => setSearchNombre(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleBuscar()} />
-          <select aria-label="Distrito" value={searchDistrito} onChange={e => setSearchDistrito(e.target.value)}>
-            <option value="">Todos los distritos</option>
-            {DISTRITOS.map(d => <option key={d} value={d}>{d}</option>)}
+          <input
+            type="text"
+            placeholder="Ciudad / distrito / cancha"
+            value={ubicacion}
+            onChange={e => setUbicacion(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleBuscar()}
+            aria-label="Ubicaci&oacute;n"
+          />
+          <input
+            type="date"
+            value={fecha}
+            onChange={e => setFecha(e.target.value)}
+            aria-label="Fecha"
+            className="search-date"
+          />
+          <input
+            type="time"
+            value={hora}
+            onChange={e => setHora(e.target.value)}
+            aria-label="Hora"
+            className="search-time"
+          />
+          <select
+            aria-label="Tipo de cancha"
+            value={tipo}
+            onChange={e => setTipo(e.target.value)}
+            className="search-tipo"
+          >
+            <option value="">Tipo de cancha</option>
+            {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
           </select>
-          <button className="btn-search" onClick={handleBuscar}>🔍 Buscar</button>
+          <button className="btn-search" onClick={handleBuscar}>
+            Buscar disponibles
+          </button>
+        </div>
+
+        {/* Trust badges */}
+        <div className="trust-badges">
+          <span className="trust-badge">
+            <span className="trust-dot" style={{ background: '#00D084' }}></span>
+            Disponibilidad actualizada
+          </span>
+          <span className="trust-badge">
+            <span className="trust-dot" style={{ background: '#7B5CF5' }}></span>
+            Pago con Yape
+          </span>
+          <span className="trust-badge">
+            <span className="trust-dot" style={{ background: '#FFB800' }}></span>
+            Comprobante inmediato
+          </span>
         </div>
       </div>
 
       <div className="page-wrap">
-        {/* Ofertas del día */}
+        {/* OFERTAS — solo si hay ofertas reales */}
         {ofertas.length > 0 && (
-          <div style={{
-            background: 'linear-gradient(135deg, #0D1117 0%, #161B25 100%)',
-            borderRadius: '16px', padding: '24px', marginBottom: '32px',
-            border: '1px solid #2A3345', position: 'relative', overflow: 'hidden'
-          }}>
-            <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,208,132,0.2) 0%, transparent 70%)' }}></div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '17px', fontWeight: 700, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#00D084', boxShadow: '0 0 0 0 rgba(0,208,132,0.4)', animation: 'pulse 1.8s infinite' }}></span>
-                ⚡ Último Minuto — Hoy
+          <div className="ofertas-section">
+            <div className="ofertas-header">
+              <div className="ofertas-title">
+                <span className="ofertas-pulse"></span>
+                Ofertas de &uacute;ltimo minuto
               </div>
+              <Link to="/buscar?ofertas=1" className="ofertas-ver-todas">
+                Ver todas &rarr;
+              </Link>
             </div>
-            <div style={{ display: 'flex', gap: '14px', overflowX: 'auto', paddingBottom: '4px' }}>
+            <div className="ofertas-scroll">
               {ofertas.map((of, i) => {
                 const fotoOferta = getImageUrl(of.Foto_URL || of.Fotos?.[0]?.URL_Foto);
                 const tieneDto = of.Precio_Original > 0 && of.Precio_Oferta > 0;
                 return (
-                  <Link key={`${of.ID_Cancha}-${of.Hora_Inicio || ''}-${of.Hora_Fin || ''}-${i}`} to={`/cancha/${of.ID_Cancha}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div style={{
-                      background: '#1E2535', borderRadius: '12px', padding: '16px',
-                      minWidth: '260px', border: '1px solid #2A3345', flexShrink: 0, cursor: 'pointer'
-                    }}>
-                      {fotoOferta && (
-                        <img src={fotoOferta} alt={of.Nombre} style={{ width: '100%', height: '90px', objectFit: 'cover', borderRadius: '8px', marginBottom: '10px', background: '#2A3345' }} />
-                      )}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px', fontSize: '11px', color: '#8A93A2' }}>
+                  <Link
+                    key={`${of.ID_Cancha}-${of.Hora_Inicio || ''}-${of.Hora_Fin || ''}-${i}`}
+                    to={`/cancha/${of.ID_Cancha}`}
+                    className="oferta-card"
+                  >
+                    {fotoOferta && (
+                      <img src={fotoOferta} alt={of.Nombre} className="oferta-img" />
+                    )}
+                    <div className="oferta-body">
+                      <div className="oferta-meta">
                         <span>{of.Distrito || of.Dia_Semana || ''}</span>
-                        {of.Rating > 0 && (
-                          <span style={{ color: '#FFB800' }}>⭐ {of.Rating.toFixed(1)}</span>
-                        )}
+                        <span className="oferta-horario">
+                          {of.Hora_Inicio?.substring(0, 5)} &mdash; {of.Hora_Fin?.substring(0, 5)}
+                        </span>
                       </div>
-                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#C8CDD6', marginBottom: '2px' }}>{of.Nombre}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#8A93A2', marginBottom: '6px' }}>
-                        {of.Dia_Semana && <span>📅 {of.Dia_Semana}</span>}
-                        <span>🕐 {of.Hora_Inicio?.substring(0, 5)} — {of.Hora_Fin?.substring(0, 5)}</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="oferta-nombre">{of.Nombre}</div>
+                      <div className="oferta-footer">
                         {tieneDto ? (
                           <>
-                            <span style={{ fontSize: '13px', color: '#8A93A2', textDecoration: 'line-through' }}>S/ {parseFloat(of.Precio_Original).toFixed(2)}</span>
-                            <span style={{ fontFamily: "'Syne', sans-serif", fontSize: '22px', fontWeight: 800, color: '#00D084' }}>S/ {parseFloat(of.Precio_Oferta).toFixed(2)}</span>
+                            <span className="oferta-precio-original">S/ {parseFloat(of.Precio_Original).toFixed(2)}</span>
+                            <span className="oferta-precio-oferta">S/ {parseFloat(of.Precio_Oferta).toFixed(2)}</span>
                             {of.Descuento > 0 && (
-                              <span style={{ background: '#FFB800', color: '#0D1117', fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>-{of.Descuento}%</span>
+                              <span className="oferta-descuento">-{of.Descuento}%</span>
                             )}
                           </>
-                        ) : (
-                          <span style={{ fontFamily: "'Syne', sans-serif", fontSize: '16px', fontWeight: 600, color: '#C8CDD6' }}>
-                            {of.Precio_Oferta > 0 ? `S/ ${parseFloat(of.Precio_Oferta).toFixed(2)}` : ''}
-                          </span>
+                        ) : of.Precio_Oferta > 0 ? (
+                          <span className="oferta-precio-oferta">S/ {parseFloat(of.Precio_Oferta).toFixed(2)}</span>
+                        ) : null}
+                        {of.Minutos_Restantes && (
+                          <span className="oferta-restante">{of.Minutos_Restantes} restantes</span>
                         )}
                       </div>
-                      {of.Minutos_Restantes && (
-                        <div style={{ fontSize: '12px', color: '#FFB800', fontWeight: 600, marginTop: '8px' }}>
-                          ⏱ {of.Minutos_Restantes} restantes
-                        </div>
-                      )}
+                      <button className="btn-reservar-oferta">Reservar</button>
                     </div>
                   </Link>
                 );
@@ -126,66 +191,141 @@ const Home = () => {
         )}
 
         {loadingOfertas && ofertas.length === 0 && (
-          <div style={{ background: '#0D1117', borderRadius: '16px', padding: '24px', marginBottom: '32px', border: '1px solid #2A3345' }}>
-            <div style={{ display: 'flex', gap: '14px', overflow: 'hidden' }}>
-              {[1, 2, 3].map(i => (
-                <div key={i} style={{ minWidth: '240px', height: '160px', borderRadius: '12px', background: 'linear-gradient(90deg, #1E2535 25%, #2A3345 50%, #1E2535 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite' }} />
-              ))}
-            </div>
+          <div className="skeleton-ofertas">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="skeleton-card" />
+            ))}
           </div>
         )}
 
+        {/* CANCHAS RECOMENDADAS */}
         <div className="section-header">
           <div>
-            <h2 className="section-title">Canchas disponibles</h2>
-            <p className="section-sub">{loading ? 'Cargando...' : `Mostrando ${canchas.length} canchas cerca de ti`}</p>
+            <h2 className="section-title">Canchas recomendadas cerca de ti</h2>
+            <p className="section-sub">
+              {loading ? 'Cargando...' : `${canchas.length} canchas disponibles`}
+            </p>
           </div>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>Cargando canchas...</div>
+          <div className="cards-grid">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="skeleton-card-cancha" />
+            ))}
+          </div>
         ) : canchas.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
+          <div className="empty-state">
             <p>No hay canchas disponibles en este momento.</p>
           </div>
         ) : (
           <div className="cards-grid">
-            {canchas.map((cancha) => (
-              <Link
-                to={`/cancha/${cancha.ID_Cancha}`}
-                key={cancha.ID_Cancha}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <div className="cancha-card">
-                  <img
-                    className="cancha-card-img"
-                    src={fotoUrl(cancha)}
-                    alt={cancha.Nombre}
-                    loading="lazy"
-                  />
-                  <div className="cancha-card-body">
-                    <div className="cancha-card-distrito">{cancha.Distrito}</div>
-                    <div className="cancha-card-nombre">{cancha.Nombre}</div>
-                    <div className="cancha-card-tipo">{cancha.Descripcion || 'Cancha deportiva'}</div>
-                  </div>
-                  <div className="cancha-card-footer">
-                    <div className="cancha-price">
-                      S/ {cancha.Precio_Base.toFixed(2)} <small>/ hora</small>
+            {canchas.slice(0, 6).map((cancha) => {
+              const r = ratingRedondeado(cancha);
+              return (
+                <Link
+                  to={`/cancha/${cancha.ID_Cancha}`}
+                  key={cancha.ID_Cancha}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <div className="cancha-card">
+                    <img
+                      className="cancha-card-img"
+                      src={fotoUrl(cancha)}
+                      alt={cancha.Nombre}
+                      loading="lazy"
+                    />
+                    <div className="cancha-card-body">
+                      <div className="cancha-card-distrito">{cancha.Distrito}</div>
+                      <div className="cancha-card-nombre">{cancha.Nombre}</div>
+                      <div className="cancha-card-tipo">{cancha.Descripcion || 'Cancha deportiva'}</div>
                     </div>
-                    {cancha.Rating > 0 && (
-                      <div className="cancha-rating">
-                        ⭐ {cancha.Rating} <span>({cancha.TotalReviews})</span>
+                    <div className="cancha-card-footer">
+                      <div className="cancha-card-precio">
+                        S/ {Number(cancha.Precio_Base).toFixed(2)} <small>/ hora</small>
                       </div>
-                    )}
+                      {r !== null && (
+                        <div className="cancha-card-rating">
+                          {r.toFixed(1)} <span className="rating-star">&#9733;</span>
+                          {cancha.TotalReviews > 0 && (
+                            <span className="rating-count">({cancha.TotalReviews})</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="cancha-card-cta">
+                      <span className="cta-text">Ver horarios</span>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
+
+        {/* CÓMO FUNCIONA */}
+        <div className="como-funciona">
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>
+            C&oacute;mo funciona
+          </h2>
+          <div className="pasos-grid">
+            <div className="paso">
+              <div className="paso-numero">1</div>
+              <div className="paso-icono">&#128269;</div>
+              <div className="paso-titulo">Busca</div>
+              <div className="paso-desc">Encuentra canchas cerca de ti por distrito, fecha y horario.</div>
+            </div>
+            <div className="paso-divisor">
+              <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 1H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
+            </div>
+            <div className="paso">
+              <div className="paso-numero">2</div>
+              <div className="paso-icono">&#128197;</div>
+              <div className="paso-titulo">Elige horario</div>
+              <div className="paso-desc">Selecciona el d&iacute;a y la hora que mejor te quede.</div>
+            </div>
+            <div className="paso-divisor">
+              <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 2H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
+            </div>
+            <div className="paso">
+              <div className="paso-numero">3</div>
+              <div className="paso-icono">&#127928;</div>
+              <div className="paso-titulo">Paga y juega</div>
+              <div className="paso-desc">Paga con Yape y recibe tu confirmaci&oacute;n al instante.</div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* FOOTER */}
+      <footer className="home-footer">
+        <div className="footer-inner">
+          <div className="footer-col">
+            <div className="footer-brand">PichangaGo</div>
+            <div className="footer-tagline">Reserva canchas de f&uacute;tbol</div>
+          </div>
+          <div className="footer-col">
+            <div className="footer-titulo">Soporte</div>
+            <a href="#" className="footer-link">Ayuda</a>
+            <a href="#" className="footer-link">Contacto</a>
+          </div>
+          <div className="footer-col">
+            <div className="footer-titulo">Legal</div>
+            <a href="#" className="footer-link">T&eacute;rminos y condiciones</a>
+            <a href="#" className="footer-link">Pol&iacute;tica de privacidad</a>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          &copy; {new Date().getFullYear()} PichangaGo. Todos los derechos reservados.
+        </div>
+      </footer>
     </div>
   );
+};
+
+const ratingRedondeado = (cancha) => {
+  if (!cancha.Rating || cancha.Rating <= 0) return null;
+  return Math.round(cancha.Rating * 10) / 10;
 };
 
 export default Home;

@@ -3,7 +3,7 @@
 ## Archivos involucrados
 
 - `src/pages/Home.jsx` — Componente principal
-- `src/index.css` — Estilos (hero, search-bar, trust-badges, ofertas, cards, cómo funciona, footer)
+- `src/index.css` — Estilos (hero, search-bar, trust-badges, ofertas, cards, cómo funciona)
 - `src/components/Navbar.jsx` — Barra de navegación
 - `src/services/canchaService.js` — Llamadas al backend
 - `src/utils/imageUrl.js` — Utilidad para resolver URLs de imágenes
@@ -77,10 +77,6 @@ Tres pasos horizontales (en desktop):
 
 En mobile se apilan verticalmente y se ocultan los divisores.
 
-### 6. Footer
-
-Grid de 3 columnas: marca + soporte + legal. Barra inferior con copyright.
-
 ---
 
 ## Geolocalización
@@ -128,4 +124,6 @@ Si el usuario rechaza o hay timeout, se cargan todas sin orden geográfico.
 - La hora en el buscador es opcional. Si no se selecciona, no se envía el parámetro.
 - El tipo de cancha se eliminó del Home porque los usuarios ajustan según los jugadores disponibles.
 - El botón "Buscar disponibles" ocupa todo el ancho en mobile.
-- La geolocalización necesita implementación del lado del backend para recibir `lat`/`lng` y ordenar/filtrar.
+- La geolocalización está implementada en el backend (recibe `lat`/`lng` y ordena por cercanía mediante la fórmula del haversine), pero requiere agregar coordenadas (`Latitud`, `Longitud`) a la tabla `Local` en la BD para que el cálculo de distancia funcione correctamente. Actualmente se usa `0` como placeholder para las coordenadas de las canchas.
+- El endpoint `GET /api/canchas` ahora soporta los filtros `fecha`, `hora`, `lat` y `lng` además de los existentes. Ver la tabla de endpoints para más detalle.
+- Para desarrollo local, ejecutar `npm run dev` (usa `node --watch` para recarga automática).

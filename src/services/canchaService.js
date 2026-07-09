@@ -7,6 +7,10 @@ export const canchaService = {
     if (filtros.nombre) params.append('nombre', filtros.nombre);
     if (filtros.precioMin) params.append('precioMin', filtros.precioMin);
     if (filtros.precioMax) params.append('precioMax', filtros.precioMax);
+    if (filtros.lat) params.append('lat', filtros.lat);
+    if (filtros.lng) params.append('lng', filtros.lng);
+    if (filtros.fecha) params.append('fecha', filtros.fecha);
+    if (filtros.hora) params.append('hora', filtros.hora);
     const qs = params.toString();
     const res = await apiFetch(`/api/canchas${qs ? '?' + qs : ''}`);
     return res.json();

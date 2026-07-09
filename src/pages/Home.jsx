@@ -283,28 +283,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* FOOTER */}
-      <footer className="home-footer">
-        <div className="footer-inner">
-          <div className="footer-col">
-            <div className="footer-brand">PichangaGo</div>
-            <div className="footer-tagline">Reserva canchas de f&uacute;tbol</div>
-          </div>
-          <div className="footer-col">
-            <div className="footer-titulo">Soporte</div>
-            <a href="#" className="footer-link">Ayuda</a>
-            <a href="#" className="footer-link">Contacto</a>
-          </div>
-          <div className="footer-col">
-            <div className="footer-titulo">Legal</div>
-            <a href="#" className="footer-link">T&eacute;rminos y condiciones</a>
-            <a href="#" className="footer-link">Pol&iacute;tica de privacidad</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          &copy; {new Date().getFullYear()} PichangaGo. Todos los derechos reservados.
-        </div>
-      </footer>
+
     </div>
   );
 };

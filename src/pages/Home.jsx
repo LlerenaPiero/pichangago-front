@@ -184,14 +184,28 @@ const Home = () => {
           </div>
         )}
 
-        {/* SECCIÓN DINÁMICA: ofertas si existen, sino disponibles hoy */}
-        {!loadingOfertas && ofertas.length === 0 && !loading && canchas.length > 0 && (
-          <div className="disponibles-hoy-section">
-            <div className="section-header">
-              <h2 className="section-title">Disponibles hoy cerca de ti</h2>
-            </div>
+        {/* CANCHAS RECOMENDADAS — todas las canchas según ubicación */}
+        <div className="recomendadas-section">
+          <div className="section-header">
+            <h2 className="section-title">Canchas recomendadas cerca de ti</h2>
+            <p className="section-sub">
+              {loading ? 'Cargando...' : `${canchas.length} canchas disponibles`}
+            </p>
+          </div>
+
+          {loading ? (
             <div className="cards-grid">
-              {canchas.slice(0, 4).map((cancha) => {
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="skeleton-card-cancha" />
+              ))}
+            </div>
+          ) : canchas.length === 0 ? (
+            <div className="empty-state">
+              <p>No hay canchas disponibles en este momento.</p>
+            </div>
+          ) : (
+            <div className="cards-grid">
+              {canchas.map((cancha) => {
                 const r = ratingRedondeado(cancha);
                 return (
                   <Link
@@ -221,65 +235,6 @@ const Home = () => {
                 );
               })}
             </div>
-            <div className="ver-todas-wrapper">
-              <Link to="/buscar" className="btn-ver-todas">Ver todas las canchas &rarr;</Link>
-            </div>
-          </div>
-        )}
-
-        {/* CANCHAS RECOMENDADAS — preview de 4 */}
-        <div className="recomendadas-section">
-          <div className="section-header">
-            <h2 className="section-title">Canchas recomendadas cerca de ti</h2>
-          </div>
-
-          {loading ? (
-            <div className="cards-grid">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="skeleton-card-cancha" />
-              ))}
-            </div>
-          ) : canchas.length === 0 ? (
-            <div className="empty-state">
-              <p>No hay canchas disponibles en este momento.</p>
-            </div>
-          ) : (
-            <>
-              <div className="cards-grid">
-                {canchas.slice(0, 4).map((cancha) => {
-                  const r = ratingRedondeado(cancha);
-                  return (
-                    <Link
-                      to={`/cancha/${cancha.ID_Cancha}`}
-                      key={cancha.ID_Cancha}
-                      style={{ textDecoration: 'none', color: 'inherit' }}
-                    >
-                      <div className="cancha-card">
-                        <img className="cancha-card-img" src={fotoUrl(cancha)} alt={cancha.Nombre} loading="lazy" />
-                        <div className="cancha-card-body">
-                          <div className="cancha-card-distrito">{cancha.Distrito}</div>
-                          <div className="cancha-card-nombre">{cancha.Nombre}</div>
-                          <div className="cancha-card-tipo">{cancha.Descripcion || 'Cancha deportiva'}</div>
-                        </div>
-                        <div className="cancha-card-footer">
-                          <div className="cancha-card-precio">S/ {Number(cancha.Precio_Base).toFixed(2)} <small>/ hora</small></div>
-                          {r !== null && (
-                            <div className="cancha-card-rating">
-                              {r.toFixed(1)} <span className="rating-star">&#9733;</span>
-                              {cancha.TotalReviews > 0 && <span className="rating-count">({cancha.TotalReviews})</span>}
-                            </div>
-                          )}
-                        </div>
-                        <div className="cancha-card-cta"><span className="cta-text">Ver horarios</span></div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-              <div className="ver-todas-wrapper">
-                <Link to="/buscar" className="btn-ver-todas">Ver todas las canchas &rarr;</Link>
-              </div>
-            </>
           )}
         </div>
 

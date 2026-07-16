@@ -4,12 +4,12 @@ import { formatValidationErrors } from '../../utils/validationErrors';
 
 const DISTRITOS_LIMA = ['San Juan de Miraflores', 'Santiago de Surco', 'Los Olivos', 'La Victoria', 'Chorrillos', 'San Borja', 'Miraflores', 'Magdalena del Mar', 'Barranco'];
 
-export default function GestionLocales({ onMensaje }) {
+export default function GestionLocales({ onMensaje, onLocalCambio }) {
     const [locales, setLocales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [mostrarForm, setMostrarForm] = useState(false);
     const [editandoId, setEditandoId] = useState(null);
-    const [form, setForm] = useState({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' });
+    const [form, setForm] = useState({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '', departamento: 'Lima', provincia: 'Lima' });
     const [enviando, setEnviando] = useState(false);
 
     const cargarLocales = async () => {
@@ -47,8 +47,9 @@ export default function GestionLocales({ onMensaje }) {
             onMensaje(editandoId ? '✏️ Local actualizado con éxito.' : '🏠 Local registrado con éxito.');
             setMostrarForm(false);
             setEditandoId(null);
-            setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' });
+            setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '', departamento: 'Lima', provincia: 'Lima' });
             cargarLocales();
+            if (onLocalCambio) onLocalCambio();
         } else {
             onMensaje(`❌ ${formatValidationErrors(res)}`);
         }
@@ -58,7 +59,7 @@ export default function GestionLocales({ onMensaje }) {
         const res = await localService.obtenerDetalleLocal(idLocal);
         if (res.status === 'success' && res.data) {
             const d = res.data;
-            setForm({ nombre: d.Nombre || '', direccion: d.Direccion || '', distrito: d.Distrito || 'San Juan de Miraflores', referencia: d.Referencia || '' });
+            setForm({ nombre: d.NOMBRE || '', direccion: d.DIRECCION || '', distrito: d.DISTRITO || 'San Juan de Miraflores', referencia: d.REFERENCIA || '', departamento: d.DEPARTAMENTO || 'Lima', provincia: d.PROVINCIA || 'Lima' });
             setEditandoId(idLocal);
             setMostrarForm(true);
         } else {
@@ -69,7 +70,7 @@ export default function GestionLocales({ onMensaje }) {
     const cerrarForm = () => {
         setMostrarForm(false);
         setEditandoId(null);
-        setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '' });
+        setForm({ nombre: '', direccion: '', distrito: 'San Juan de Miraflores', referencia: '', departamento: 'Lima', provincia: 'Lima' });
     };
 
     if (loading) return <p style={{ color: '#6b7280', textAlign: 'center', padding: '20px' }}>Cargando locales...</p>;
@@ -89,24 +90,24 @@ export default function GestionLocales({ onMensaje }) {
             ) : (
                 <div style={{ display: 'grid', gap: '16px' }}>
                     {locales.map((loc) => (
-                        <div key={loc.ID_Local} style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', background: '#fff' }}>
+                        <div key={loc.ID_LOCAL} style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', background: '#fff' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                    <h4 style={{ margin: '0 0 6px 0', fontSize: '18px' }}>🏢 {loc.Nombre}</h4>
-                                    <p style={{ margin: '0 0 4px 0', color: '#666', fontSize: '14px' }}>📍 {loc.Direccion} - {loc.Distrito}</p>
-                                    {loc.Referencia && <p style={{ margin: '0 0 4px 0', color: '#6b7280', fontSize: '13px' }}>📍 Ref: {loc.Referencia}</p>}
-                                    <span style={{ fontSize: '12px', padding: '3px 8px', borderRadius: '12px', background: loc.Estado === 'ACTIVO' ? '#d4edda' : '#fee2e2', color: loc.Estado === 'ACTIVO' ? 'green' : 'red', fontWeight: 'bold' }}>{loc.Estado}</span>
+                                    <h4 style={{ margin: '0 0 6px 0', fontSize: '18px' }}>🏢 {loc.NOMBRE}</h4>
+                                    <p style={{ margin: '0 0 4px 0', color: '#666', fontSize: '14px' }}>📍 {loc.DIRECCION} - {loc.DISTRITO}</p>
+                                    {loc.REFERENCIA && <p style={{ margin: '0 0 4px 0', color: '#6b7280', fontSize: '13px' }}>📍 Ref: {loc.REFERENCIA}</p>}
+                                    <span style={{ fontSize: '12px', padding: '3px 8px', borderRadius: '12px', background: loc.ESTADO === 'ACTIVO' ? '#d4edda' : '#fee2e2', color: loc.ESTADO === 'ACTIVO' ? 'green' : 'red', fontWeight: 'bold' }}>{loc.ESTADO}</span>
                                 </div>
-                                <button onClick={() => abrirEditar(loc.ID_Local)} style={{ background: '#1e2530', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>✏️ Editar</button>
+                                <button onClick={() => abrirEditar(loc.ID_LOCAL)} style={{ background: '#1e2530', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>✏️ Editar</button>
                             </div>
                             {loc.Canchas && loc.Canchas.length > 0 && (
                                 <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #eee' }}>
                                     <p style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '6px', color: '#555' }}>🏟️ Canchas asociadas ({loc.Canchas.length}):</p>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                         {loc.Canchas.map((c, i) => (
-                                            <span key={c.ID_Cancha || i} style={{ padding: '4px 10px', borderRadius: '4px', background: '#f0f0f0', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                                🏟️ {c.CanchaNombre || c.Nombre}
-                                                <span style={{ fontSize: '10px', color: c.CanchaEstado === 'DISPONIBLE' ? 'green' : 'red' }}>({c.CanchaEstado || c.Estado})</span>
+                                            <span key={c.ID_CANCHA || i} style={{ padding: '4px 10px', borderRadius: '4px', background: '#f0f0f0', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                                🏟️ {c.CANCHA_NOMBRE || c.NOMBRE}
+                                                <span style={{ fontSize: '10px', color: c.CANCHA_ESTADO === 'DISPONIBLE' ? 'green' : 'red' }}>({c.CANCHA_ESTADO || c.ESTADO})</span>
                                             </span>
                                         ))}
                                     </div>
@@ -129,6 +130,16 @@ export default function GestionLocales({ onMensaje }) {
                             <div style={{ marginBottom: '10px' }}>
                                 <label htmlFor="loc-direccion">🏠 Dirección:</label>
                                 <input id="loc-direccion" type="text" required value={form.direccion} onChange={e => setForm({...form, direccion: e.target.value})} style={{ width: '100%', padding: '6px', marginTop: '4px' }} placeholder="Av./Calle y número" />
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label htmlFor="loc-departamento">🗺️ Departamento:</label>
+                                    <input id="loc-departamento" type="text" value={form.departamento} onChange={e => setForm({...form, departamento: e.target.value})} style={{ width: '100%', padding: '6px', marginTop: '4px' }} placeholder="Lima" />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label htmlFor="loc-provincia">🗺️ Provincia:</label>
+                                    <input id="loc-provincia" type="text" value={form.provincia} onChange={e => setForm({...form, provincia: e.target.value})} style={{ width: '100%', padding: '6px', marginTop: '4px' }} placeholder="Lima" />
+                                </div>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
                                 <label htmlFor="loc-distrito">📍 Distrito:</label>

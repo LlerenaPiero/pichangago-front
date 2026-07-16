@@ -2,11 +2,15 @@ import { useState } from 'react';
 import RegistroCanchaForm from './RegistroCanchaForm';
 import PerfilFinanciero from './PerfilFinanciero';
 import { duenoService } from '../../services/duenoService';
+import { localService } from '../../services/localService';
 import { generarBloquesHorarios } from '../../utils/horarios';
 
 export default function DuenoOnboarding() {
-    const [paso, setPaso] = useState(1); // Paso 1: Cancha, Paso 2: Finanzas, Paso 3: Horarios
+    const [paso, setPaso] = useState(1); // Paso 1: Local, Paso 2: Cancha, Paso 3: Finanzas, Paso 4: Horarios
     const [idCanchaCreada, setIdCanchaCreada] = useState(null);
+    const [localForm, setLocalForm] = useState({ nombre: '', direccion: '', distrito: '' });
+    const [localMensaje, setLocalMensaje] = useState('');
+    const [localEnviando, setLocalEnviando] = useState(false);
     
     // Estados para el constructor de horarios (Paso 3)
     const [listaHorarios, setListaHorarios] = useState([]);
@@ -61,24 +65,67 @@ export default function DuenoOnboarding() {
         <div style={{ padding: '80px 24px', fontFamily: 'Arial, sans-serif' }}>
             {/* Indicador visual de pasos */}
             <div style={{ display: 'flex', justifyContent: 'space-around', background: '#f0f4f8', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-                <span style={{ fontWeight: paso === 1 ? 'bold' : 'normal', color: paso === 1 ? '#008060' : '#999' }}>1. Registrar Cancha</span>
-                <span style={{ fontWeight: paso === 2 ? 'bold' : 'normal', color: paso === 2 ? '#008060' : '#999' }}>2. Configurar Cobros</span>
-                <span style={{ fontWeight: paso === 3 ? 'bold' : 'normal', color: paso === 3 ? '#008060' : '#999' }}>3. Asignar Horarios y Tarifas</span>
+                <span style={{ fontWeight: paso === 1 ? 'bold' : 'normal', color: paso === 1 ? '#008060' : '#999' }}>1. Registrar Local</span>
+                <span style={{ fontWeight: paso === 2 ? 'bold' : 'normal', color: paso === 2 ? '#008060' : '#999' }}>2. Crear Cancha</span>
+                <span style={{ fontWeight: paso === 3 ? 'bold' : 'normal', color: paso === 3 ? '#008060' : '#999' }}>3. Configurar Cobros</span>
+                <span style={{ fontWeight: paso === 4 ? 'bold' : 'normal', color: paso === 4 ? '#008060' : '#999' }}>4. Asignar Horarios y Tarifas</span>
             </div>
 
             {/* RENDERIZADO DINÁMICO */}
             {paso === 1 && (
-                <RegistroCanchaForm onCanchaCreada={(id) => {
-                    setIdCanchaCreada(id);
-                    setPaso(2);
-                }} />
+                <div style={{ maxWidth: '500px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
+                    <h2>🏢 Registrar Local</h2>
+                    <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>Ingresa los datos del local (complejo deportivo) donde operarán tus canchas.</p>
+                    {localMensaje && <div role="alert" style={{ color: localMensaje.startsWith('✅') ? 'green' : 'red', fontWeight: 'bold', padding: '10px', background: localMensaje.startsWith('✅') ? '#d4edda' : '#fee2e2', borderRadius: '6px', marginBottom: '15px' }}>{localMensaje}</div>}
+                    <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        setLocalEnviando(true);
+                        setLocalMensaje('');
+                        try {
+                            const res = await localService.registrarLocal(localForm);
+                            if (res.status === 'success') {
+                                setLocalMensaje('✅ Local registrado correctamente.');
+                                setTimeout(() => setPaso(2), 800);
+                            } else {
+                                setLocalMensaje(res.error || 'Error al registrar el local.');
+                            }
+                        } catch (err) {
+                            setLocalMensaje('Error de conexión al registrar el local.');
+                        } finally {
+                            setLocalEnviando(false);
+                        }
+                    }}>
+                        <div style={{ marginBottom: '12px' }}>
+                            <label htmlFor="ob-local-nombre">📌 Nombre del Local:</label>
+                            <input id="ob-local-nombre" type="text" value={localForm.nombre} required onChange={e => setLocalForm({...localForm, nombre: e.target.value})} placeholder="Ej: Complejo Deportivo Los Olivos" style={{ width: '100%', padding: '6px' }} />
+                        </div>
+                        <div style={{ marginBottom: '12px' }}>
+                            <label htmlFor="ob-local-direccion">📍 Dirección:</label>
+                            <input id="ob-local-direccion" type="text" value={localForm.direccion} required onChange={e => setLocalForm({...localForm, direccion: e.target.value})} placeholder="Ej: Av. Principal 123" style={{ width: '100%', padding: '6px' }} />
+                        </div>
+                        <div style={{ marginBottom: '12px' }}>
+                            <label htmlFor="ob-local-distrito">🗺️ Distrito:</label>
+                            <input id="ob-local-distrito" type="text" value={localForm.distrito} required onChange={e => setLocalForm({...localForm, distrito: e.target.value})} placeholder="Ej: San Miguel" style={{ width: '100%', padding: '6px' }} />
+                        </div>
+                        <button type="submit" disabled={localEnviando} style={{ background: localEnviando ? '#ccc' : '#008060', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '5px', cursor: localEnviando ? 'not-allowed' : 'pointer', width: '100%', fontWeight: 'bold', marginTop: '10px' }}>
+                            {localEnviando ? 'Registrando...' : 'Guardar Local y Continuar'}
+                        </button>
+                    </form>
+                </div>
             )}
 
             {paso === 2 && (
-                <PerfilFinanciero onConfiguracionExitosa={() => setPaso(3)} />
+                <RegistroCanchaForm onCanchaCreada={(id) => {
+                    setIdCanchaCreada(id);
+                    setPaso(3);
+                }} />
             )}
 
             {paso === 3 && (
+                <PerfilFinanciero onConfiguracionExitosa={() => setPaso(4)} />
+            )}
+
+            {paso === 4 && (
                 <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
                     <h2>📅 Configuración de Disponibilidad y Precios</h2>
                     <p style={{ fontSize: '14px', color: '#666' }}>Arma el cronograma de tu cancha. Puedes agregar múltiples turnos por día.</p>

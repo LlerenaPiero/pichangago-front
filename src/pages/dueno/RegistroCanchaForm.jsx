@@ -20,7 +20,11 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
         idLocal: '',
         precioBase: '',
         precioPrime: '',
-        precioBaja: ''
+        precioBaja: '',
+        tipoSuperficie: '',
+        tipoCancha: '',
+        esTechada: false,
+        tieneIluminacion: true
     });
     const [fotoFile, setFotoFile] = useState(null);
     const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
@@ -49,13 +53,19 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
         e.preventDefault();
         if (!fotoFile) return setMensaje({ tipo: 'error', texto: '⚠️ Debes seleccionar una foto para la cancha.' });
 
+        if (!formData.tipoCancha) return setMensaje({ tipo: 'error', texto: '⚠️ Debes seleccionar el tipo de cancha.' });
+
         setEnviando(true);
         setMensaje({ tipo: '', texto: '' });
 
         const datosParaEnviar = {
             ...formData,
-            precioPrime: formData.precioPrime || formData.precioBase,
-            precioBaja: formData.precioBaja || formData.precioBase
+            precioBase: parseFloat(formData.precioBase) || 0,
+            precioPrime: parseFloat(formData.precioPrime || formData.precioBase) || 0,
+            precioBaja: parseFloat(formData.precioBaja || formData.precioBase) || 0,
+            tipo: formData.tipoCancha,
+            esTechada: formData.esTechada,
+            tieneIluminacion: formData.tieneIluminacion
         };
 
         const res = await duenoService.registrarCancha(datosParaEnviar, fotoFile);
@@ -67,13 +77,18 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
 
             setFormData({
                 nombre: '', descripcion: '', idLocal: '',
-                precioBase: '', precioPrime: '', precioBaja: ''
+                precioBase: '', precioPrime: '', precioBaja: '',
+                tipoSuperficie: '', tipoCancha: '', esTechada: false, tieneIluminacion: true
             });
             setFotoFile(null);
 
             if (onCanchaCreada) onCanchaCreada(res.idCancha);
         } else {
-            setMensaje({ tipo: 'error', texto: res.error || 'Ocurrió un error inesperado.' });
+            const esLimite = res.error && res.error.includes('límite');
+            setMensaje({
+                tipo: 'error',
+                texto: esLimite ? `⚠️ ${res.error}` : (res.error || 'Ocurrió un error inesperado.')
+            });
         }
     };
 
@@ -85,6 +100,13 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
             {mensaje.texto && (
                 <div role="alert" style={{ color: mensaje.tipo === 'success' ? 'green' : 'red', marginBottom: '15px', fontWeight: 'bold', padding: '10px', background: mensaje.tipo === 'success' ? '#d4edda' : '#fee2e2', borderRadius: '6px' }}>
                     {mensaje.texto}
+                    {mensaje.tipo === 'error' && mensaje.texto.includes('límite') && (
+                        <div style={{ marginTop: '10px' }}>
+                            <a href="/panel-dueno" style={{ color: 'white', background: '#008060', padding: '8px 16px', borderRadius: '6px', textDecoration: 'none', display: 'inline-block', fontWeight: 600, fontSize: '13px' }}>
+                                Mejorar plan →
+                            </a>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -102,7 +124,7 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
                     <label htmlFor="rcf-idLocal" title="Local al que pertenece la cancha">🏢 Local:</label>
                     <select id="rcf-idLocal" name="idLocal" value={formData.idLocal} required aria-required="true" onChange={handleChange} title="Selecciona el local" style={{ width: '100%', padding: '6px', marginBottom: '10px' }}>
                         <option value="">-- Seleccionar Local --</option>
-                        {locales.map(l => <option key={l.ID_Local} value={l.ID_Local}>{l.Nombre} - {l.Distrito}</option>)}
+                        {locales.map(l => <option key={l.ID_LOCAL} value={l.ID_LOCAL}>{l.NOMBRE} - {l.DISTRITO}</option>)}
                     </select>
                     {locales.length === 0 && <p style={{ fontSize: '11px', color: 'red', marginTop: '-8px', marginBottom: '10px' }}>No hay locales registrados. Crea uno primero.</p>}
                 </div>
@@ -122,6 +144,35 @@ export default function RegistroCanchaForm({ onCanchaCreada }) {
                     <label htmlFor="rcf-precioBaja" title={AYUDA.precioBaja}>🟡 Precio Baja (S/):</label>
                     <input id="rcf-precioBaja" type="number" min={1} name="precioBaja" value={formData.precioBaja} onChange={handleChange} placeholder="Opcional" title={AYUDA.precioBaja} aria-describedby="rcf-pbaja-help" style={{ width: '100%', padding: '6px' }} />
                     <span id="rcf-pbaja-help" style={{ fontSize: '11px', color: '#6b7280' }}>Mañanas (antes 12hrs)</span>
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>⚽ Tipo de Cancha:</label>
+                    <select name="tipoCancha" value={formData.tipoCancha} onChange={handleChange} required style={{ width: '100%', padding: '6px' }}>
+                        <option value="">-- Seleccionar --</option>
+                        <option value="F5">Fútbol 5 (5 vs 5)</option>
+                        <option value="F6">Fútbol 6 (6 vs 6)</option>
+                        <option value="F7">Fútbol 7 (7 vs 7)</option>
+                        <option value="F8">Fútbol 8 (8 vs 8)</option>
+                        <option value="F11">Fútbol 11 (11 vs 11)</option>
+                    </select>
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '4px' }}>🏟️ Tipo de Superficie:</label>
+                    <select name="tipoSuperficie" style={{ width: '100%', padding: '6px' }} value={formData.tipoSuperficie} onChange={handleChange}>
+                        <option value="">-- Seleccionar --</option>
+                        <option value="GRASS_SINTETICO">Grass Sintético</option>
+                        <option value="GRASS_NATURAL">Grass Natural</option>
+                    </select>
+                </div>
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input type="checkbox" name="esTechada" checked={formData.esTechada} onChange={e => setFormData({ ...formData, esTechada: e.target.checked })} />
+                        <span>🏠 Techada</span>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input type="checkbox" name="tieneIluminacion" checked={formData.tieneIluminacion} onChange={e => setFormData({ ...formData, tieneIluminacion: e.target.checked })} />
+                        <span>💡 Iluminación</span>
+                    </label>
                 </div>
                 <div>
                     <label htmlFor="rcf-foto" title={AYUDA.foto} style={{ fontWeight: 'bold' }}>📷 Foto de la Cancha <span style={{ color: 'red' }}>*</span>:</label>

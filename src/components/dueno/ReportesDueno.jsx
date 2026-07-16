@@ -88,12 +88,12 @@ function ReporteIngresos({ onMensaje }) {
                                 </tr></thead>
                                 <tbody>
                                     {data.reservas.map(r => (
-                                        <tr key={r.ID_Reserva} style={{ textAlign: 'center' }}>
+                                        <tr key={r.ID_RESERVA} style={{ textAlign: 'center' }}>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.CanchaNombre}</td>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.JugadorNombre} {r.JugadorApellido}</td>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.FechaSlot ? new Date(r.FechaSlot + 'T12:00:00').toLocaleDateString('es-PE') : '—'}</td>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.Hora_Inicio} - {r.Hora_Fin}</td>
-                                            <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold' }}>S/{parseFloat(r.Monto_Total || 0).toFixed(2)}</td>
+                                            <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold' }}>S/{parseFloat(r.MONTO_TOTAL || 0).toFixed(2)}</td>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}><span style={{ color: r.EstadoPago === 'PAGADO' ? 'green' : 'orange', fontWeight: 'bold' }}>{r.EstadoPago || '—'}</span></td>
                                             <td style={{ padding: '8px', border: '1px solid #ddd' }}><EstadoReservaBadge estado={r.EstadoReserva} /></td>
                                         </tr>
@@ -214,13 +214,13 @@ function ReporteLiquidaciones() {
                     </tr></thead>
                     <tbody>
                         {data.map(liq => (
-                            <tr key={liq.ID_Liquid} style={{ textAlign: 'center' }}>
-                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>{new Date(liq.Fecha_Inicio).toLocaleDateString('es-PE')} - {new Date(liq.Fecha_Fin).toLocaleDateString('es-PE')}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>S/{parseFloat(liq.Monto_Bruto || 0).toFixed(2)}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd', color: '#dc2626' }}>-S/{parseFloat(liq.Comision_PGO || 0).toFixed(2)}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold', color: '#008060' }}>S/{parseFloat(liq.Monto_Neto || 0).toFixed(2)}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>{liq.Fecha_Transf ? new Date(liq.Fecha_Transf).toLocaleDateString('es-PE') : '—'}</td>
-                                <td style={{ padding: '8px', border: '1px solid #ddd' }}><span style={{ padding: '3px 8px', borderRadius: '12px', background: liq.Estado === 'PAGADA' ? '#d4edda' : '#fff3cd', color: liq.Estado === 'PAGADA' ? '#155724' : '#856404', fontWeight: 'bold', fontSize: '12px' }}>{liq.Estado === 'PAGADA' ? '✅ Pagada' : '⏳ Pendiente'}</span></td>
+                            <tr key={liq.ID_LIQUIDACION} style={{ textAlign: 'center' }}>
+                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>{new Date(liq.FECHA_INICIO).toLocaleDateString('es-PE')} - {new Date(liq.FECHA_FIN).toLocaleDateString('es-PE')}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>S/{parseFloat(liq.MONTO_BRUTO || 0).toFixed(2)}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd', color: '#dc2626' }}>-S/{parseFloat(liq.COMISION_PGO || 0).toFixed(2)}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold', color: '#008060' }}>S/{parseFloat(liq.MONTO_NETO || 0).toFixed(2)}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd' }}>{liq.FECHA_TRANSF ? new Date(liq.FECHA_TRANSF).toLocaleDateString('es-PE') : '—'}</td>
+                                <td style={{ padding: '8px', border: '1px solid #ddd' }}><span style={{ padding: '3px 8px', borderRadius: '12px', background: liq.ESTADO === 'PAGADA' ? '#d4edda' : '#fff3cd', color: liq.ESTADO === 'PAGADA' ? '#155724' : '#856404', fontWeight: 'bold', fontSize: '12px' }}>{liq.ESTADO === 'PAGADA' ? '✅ Pagada' : '⏳ Pendiente'}</span></td>
                             </tr>
                         ))}
                     </tbody>
@@ -403,12 +403,12 @@ function ReporteHistorialReservas() {
                         </tr></thead>
                         <tbody>
                             {data.map(r => (
-                                <tr key={r.ID_Reserva} style={{ textAlign: 'center' }}>
+                                <tr key={r.ID_RESERVA} style={{ textAlign: 'center' }}>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.CanchaNombre}</td>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.JugadorNombre} {r.JugadorApellido}</td>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.FechaSlot ? new Date(r.FechaSlot + 'T12:00:00').toLocaleDateString('es-PE') : '—'}</td>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}>{r.Hora_Inicio} - {r.Hora_Fin}</td>
-                                    <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold' }}>S/{parseFloat(r.Monto_Total || 0).toFixed(2)}</td>
+                                    <td style={{ padding: '8px', border: '1px solid #ddd', fontWeight: 'bold' }}>S/{parseFloat(r.MONTO_TOTAL || 0).toFixed(2)}</td>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}><span style={{ color: r.EstadoPago === 'PAGADO' ? 'green' : 'orange', fontWeight: 'bold' }}>{r.EstadoPago || '—'}</span></td>
                                     <td style={{ padding: '8px', border: '1px solid #ddd' }}><EstadoReservaBadge estado={r.EstadoReserva} /></td>
                                 </tr>

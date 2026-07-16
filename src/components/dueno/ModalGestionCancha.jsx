@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { duenoService } from '../../services/duenoService';
-import { getImageUrl } from '../../utils/imageUrl';
+import { getImageUrl, FALLBACK_IMG } from '../../utils/imageUrl';
 import { generarBloquesHorarios } from '../../utils/horarios';
 import { formatValidationErrors } from '../../utils/validationErrors';
 import ConfirmDialog from '../ConfirmDialog';
@@ -45,23 +45,27 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
         }
         const data = detalle.data;
         const base = {
-            _id: data.ID_Cancha,
-            _nombre: data.Nombre || '',
+            _id: data.ID_CANCHA,
+            _nombre: data.NOMBRE || '',
             _fotos: data.Fotos || []
         };
         setGestionandoCancha(base);
         setGestionSubTab('info');
         setEditandoCancha({
-            _id: data.ID_Cancha,
+            _id: data.ID_CANCHA,
             _fotos: data.Fotos || [],
-            _localNombre: data.LocalNombre || data.Nombre || '',
-            _localDireccion: data.LocalDireccion || data.Direccion || '',
-            _localDistrito: data.LocalDistrito || data.Distrito || '',
-            nombre: data.Nombre || '',
-            descripcion: data.Descripcion || '',
-            precioBase: data.Precio_Base || '',
-            precioPrime: data.Precio_Prime || '',
-            precioBaja: data.Precio_Baja || ''
+            _localNombre: data.LocalNombre || data.NOMBRE || '',
+            _localDireccion: data.LocalDireccion || data.DIRECCION || '',
+            _localDistrito: data.LocalDistrito || data.DISTRITO || '',
+            nombre: data.NOMBRE || '',
+            descripcion: data.DESCRIPCION || '',
+            precioBase: data.Precio_Base || data.PRECIO_BASE || '',
+            precioPrime: data.Precio_Prime || data.PRECIO_HORA_PUNTA || '',
+            precioBaja: data.Precio_Baja || data.PRECIO_HORA_VALLE || '',
+            tipoSuperficie: data.TIPO_SUPERFICIE || '',
+            tipoCancha: data.TipoCodigo || data.CODIGO_TIPO || '',
+            esTechada: data.ES_TECHADA || false,
+            tieneIluminacion: data.TIENE_ILUMINACION !== undefined ? data.TIENE_ILUMINACION : true
         });
         setEditFotoFile(null);
         setGridState({});
@@ -113,16 +117,16 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
         if (horariosExistentes.length > 0) {
             const map = {};
             horariosExistentes.forEach(h => {
-                const dia = h.Dia_Semana !== undefined ? h.Dia_Semana : 0;
-                const hora = extraerHora(h.Fecha_Inicio || h.Hora_Inicio);
+                const dia = h.DIA_SEMANA !== undefined ? h.DIA_SEMANA : 0;
+                const hora = extraerHora(h.HORA_INICIO || h.Hora_Inicio);
                 if (hora && h.Estado !== 'INACTIVO') {
-                    const horaFin = extraerHora(h.Fecha_Fin || h.Hora_Fin);
+                    const horaFin = extraerHora(h.HORA_FIN || h.Hora_Fin);
                     const [hh, mm] = hora.split(':').map(Number);
                     map[`${dia}:${hora}`] = {
                         diaSemana: dia,
                         horaInicio: hora,
                         horaFin: horaFin || `${String(hh + 1).padStart(2, '0')}:${String(mm).padStart(2, '0')}`,
-                        tipoPrecio: h.Tipo_Precio || 'BASE'
+                        tipoPrecio: h.TIPO_PRECIO || 'BASE'
                     };
                 }
             });
@@ -179,9 +183,13 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
         const datos = {
             nombre: editandoCancha.nombre,
             descripcion: editandoCancha.descripcion,
-            precioBase: editandoCancha.precioBase,
-            precioPrime: editandoCancha.precioPrime || editandoCancha.precioBase,
-            precioBaja: editandoCancha.precioBaja || editandoCancha.precioBase
+            precioBase: parseFloat(editandoCancha.precioBase) || 0,
+            precioPrime: parseFloat(editandoCancha.precioPrime || editandoCancha.precioBase) || 0,
+            precioBaja: parseFloat(editandoCancha.precioBaja || editandoCancha.precioBase) || 0,
+            tipoSuperficie: editandoCancha.tipoSuperficie || '',
+            tipo: editandoCancha.tipoCancha || '',
+            esTechada: editandoCancha.esTechada,
+            tieneIluminacion: editandoCancha.tieneIluminacion
         };
         const res = await duenoService.editarCancha(editandoCancha._id, datos, editFotoFile);
         if (res.status === 'success') {
@@ -296,6 +304,37 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                         style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #ddd', fontSize: '14px', fontWeight: 'bold', outline: 'none' }} />
                                 </div>
                             </div>
+                        </div>
+                        <div style={{ marginBottom: '14px' }}>
+                            <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '4px', color: '#333' }}>⚽ Tipo de Cancha</label>
+                            <select value={editandoCancha.tipoCancha} onChange={e => setEditandoCancha({ ...editandoCancha, tipoCancha: e.target.value })}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #ddd', fontSize: '14px', outline: 'none' }}>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="F5">Fútbol 5 (5 vs 5)</option>
+                                <option value="F6">Fútbol 6 (6 vs 6)</option>
+                                <option value="F7">Fútbol 7 (7 vs 7)</option>
+                                <option value="F8">Fútbol 8 (8 vs 8)</option>
+                                <option value="F11">Fútbol 11 (11 vs 11)</option>
+                            </select>
+                        </div>
+                        <div style={{ marginBottom: '14px' }}>
+                            <label style={{ display: 'block', fontWeight: 600, fontSize: '13px', marginBottom: '4px', color: '#333' }}>🏟️ Tipo de Superficie</label>
+                            <select value={editandoCancha.tipoSuperficie} onChange={e => setEditandoCancha({ ...editandoCancha, tipoSuperficie: e.target.value })}
+                                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #ddd', fontSize: '14px', outline: 'none' }}>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="GRASS_SINTETICO">Grass Sintético</option>
+                                <option value="GRASS_NATURAL">Grass Natural</option>
+                            </select>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', marginBottom: '14px' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <input type="checkbox" checked={editandoCancha.esTechada} onChange={e => setEditandoCancha({ ...editandoCancha, esTechada: e.target.checked })} />
+                                <span>🏠 Techada</span>
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                                <input type="checkbox" checked={editandoCancha.tieneIluminacion} onChange={e => setEditandoCancha({ ...editandoCancha, tieneIluminacion: e.target.checked })} />
+                                <span>💡 Iluminación</span>
+                            </label>
                         </div>
                         <button type="submit" style={{ background: '#008060', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', width: '100%', fontSize: '14px' }}>💾 Guardar Cambios</button>
                     </form>
@@ -422,13 +461,13 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                 </div>
                                 <div style={{ display: 'grid', gap: '12px' }}>
                                     {reviews.reviews.map(r => (
-                                        <div key={r.ID_Review} style={{ border: '1px solid #eee', borderRadius: '8px', padding: '14px', background: '#fafafa' }}>
+                                        <div key={r.ID_REVIEW} style={{ border: '1px solid #eee', borderRadius: '8px', padding: '14px', background: '#fafafa' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                                                 <span style={{ fontWeight: 'bold', fontSize: '14px' }}>👤 {r.JugadorNombre} {r.JugadorApellido}</span>
                                                 <span style={{ fontSize: '16px' }}>{'⭐'.repeat(Math.min(r.Calificacion || 0, 5))}</span>
                                             </div>
                                             {r.Comentarios && <p style={{ margin: 0, fontSize: '13px', color: '#555' }}>{r.Comentarios}</p>}
-                                            <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px', display: 'block' }}>{new Date(r.Fecha_Crea).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                            <span style={{ fontSize: '11px', color: '#6b7280', marginTop: '6px', display: 'block' }}>{new Date(r.FECHA_CREA).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -449,9 +488,10 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                         {editandoCancha?._fotos?.length > 0 ? (
                             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginBottom: '20px' }}>
                                 {editandoCancha._fotos.map(f => (
-                                    <div key={f.ID_Foto} style={{ position: 'relative', display: 'inline-block', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-                                        <img src={getImageUrl(f.URL_Foto)} alt={`Foto de ${editandoCancha._nombre || 'la cancha'}`} style={{ width: '130px', height: '100px', objectFit: 'cover', display: 'block' }} />
-                                        <button type="button" onClick={() => setConfirmEliminar(f.ID_Foto)} title="Eliminar esta foto"
+                                    <div key={f.ID_FOTO} style={{ position: 'relative', display: 'inline-block', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+                                        <img src={getImageUrl(f.URL_FOTO)} alt={`Foto de ${editandoCancha._nombre || 'la cancha'}`} style={{ width: '130px', height: '100px', objectFit: 'cover', display: 'block' }}
+                                                onError={e => { if (e.target.src !== FALLBACK_IMG) e.target.src = FALLBACK_IMG; }} />
+                                        <button type="button" onClick={() => setConfirmEliminar(f.ID_FOTO)} title="Eliminar esta foto"
                                             style={{ position: 'absolute', top: '6px', right: '6px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '50%', width: '26px', height: '26px', cursor: 'pointer', fontSize: '14px', lineHeight: '26px', padding: 0, fontWeight: 'bold', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }}>×</button>
                                     </div>
                                 ))}
@@ -484,7 +524,10 @@ export default function ModalGestionCancha({ canchaId, onCerrar, onMensaje, onAc
                                         descripcion: editandoCancha.descripcion,
                                         precioBase: editandoCancha.precioBase,
                                         precioPrime: editandoCancha.precioPrime,
-                                        precioBaja: editandoCancha.precioBaja
+                                        precioBaja: editandoCancha.precioBaja,
+                                        tipoSuperficie: editandoCancha.tipoSuperficie || '',
+                                        esTechada: editandoCancha.esTechada || false,
+                                        tieneIluminacion: editandoCancha.tieneIluminacion !== undefined ? editandoCancha.tieneIluminacion : true
                                     };
                                     const res = await duenoService.editarCancha(editandoCancha._id, datos, editFotoFile);
                                     if (res.status === 'success') {

@@ -124,12 +124,12 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
         if (!nombreCancha || slotsSeleccionados.length === 0 || !expira) return;
         if (porcentaje < 1 || porcentaje > 50) { onMensaje('⚠️ El % debe estar entre 1 y 50.'); return; }
         for (const idSlot of slotsSeleccionados) {
-            const slotInfo = slots.find(s => s.ID_Slots === idSlot);
-            const canchaInfo = canchas.find(c => c.Nombre === nombreCancha);
+            const slotInfo = slots.find(s => s.ID_SLOT === idSlot);
+            const canchaInfo = canchas.find(c => c.NOMBRE === nombreCancha);
             let precioOfertado;
             if (slotInfo && canchaInfo) {
-                const precioKey = slotInfo.Tipo_Precio === 'PRIME' ? 'Precio_Prime' : slotInfo.Tipo_Precio === 'BAJA' ? 'Precio_Baja' : 'Precio_Base';
-                const precioBase = canchaInfo[precioKey] || canchaInfo.Precio_Base;
+                const precioKey = slotInfo.TIPO_PRECIO === 'PRIME' ? 'Precio_Prime' : slotInfo.TIPO_PRECIO === 'BAJA' ? 'Precio_Baja' : 'Precio_Base';
+                const precioBase = canchaInfo[precioKey] || canchaInfo.Precio_Base || canchaInfo.PRECIO_BASE;
                 if (precioBase) precioOfertado = Math.round(precioBase * (1 - parseInt(porcentaje, 10) / 100) * 100) / 100;
             }
             const body = { porcentajeDescuento: parseInt(porcentaje, 10), fechaExpira: expira };
@@ -165,7 +165,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
         if (!slotsPorCancha[nombre]) slotsPorCancha[nombre] = [];
         slotsPorCancha[nombre].push(s);
     });
-    Object.values(slotsPorCancha).forEach(arr => arr.sort((a, b) => (a.Hora_Inicio || a.Fecha_Inicio || '').localeCompare(b.Hora_Inicio || b.Fecha_Inicio || '')));
+    Object.values(slotsPorCancha).forEach(arr => arr.sort((a, b) => (a.HORA_INICIO || '').localeCompare(b.Hora_Inicio || b.Fecha_Inicio || '')));
 
     const stats = {
         total: slots.length,
@@ -180,18 +180,18 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
 
     const renderSlotRow = (slot) => {
         const color = COLOR_MAP[slot.EstadoSlot] || COLOR_MAP.BLOQUEADO;
-        const hora = `${extraerHora(slot.Fecha_Inicio || slot.Hora_Inicio)} - ${extraerHora(slot.Fecha_Fin || slot.Hora_Fin)}`;
+        const hora = `${extraerHora(slot.HORA_INICIO)} - ${extraerHora(slot.HORA_FIN)}`;
 
         const accionesDisponible = (
             <div style={CARD_STYLES.actions}>
-                <button onClick={() => handleCambiarEstado(slot.ID_Slots, 'BLOQUEADO')} title="Bloquear"
+                <button onClick={() => handleCambiarEstado(slot.ID_SLOT, 'BLOQUEADO')} title="Bloquear"
                     style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🔒 Bloquear</button>
             </div>
         );
 
         const accionesBloqueado = (
             <div style={CARD_STYLES.actions}>
-                <button onClick={() => handleCambiarEstado(slot.ID_Slots, 'DISPONIBLE')} title="Reabrir"
+                <button onClick={() => handleCambiarEstado(slot.ID_SLOT, 'DISPONIBLE')} title="Reabrir"
                     style={{ background: '#dcfce7', color: '#16a34a', border: '1px solid #86efac', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🔓 Desbloquear</button>
             </div>
         );
@@ -200,36 +200,36 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', marginLeft: 'auto', fontSize: '13px' }}>
                 <span style={{ fontWeight: 'bold', color: '#1e40af' }}>👤 {slot.JugadorNombre || '—'}</span>
                 {slot.JugadorTelefono && <span style={{ color: '#555' }}>📞 {slot.JugadorTelefono}</span>}
-                {slot.Monto_Total && <span style={{ color: '#166534', fontWeight: 'bold' }}>💰 S/ {Number(slot.Monto_Total).toFixed(2)}</span>}
+                {slot.MONTO_TOTAL && <span style={{ color: '#166534', fontWeight: 'bold' }}>💰 S/ {Number(slot.MONTO_TOTAL).toFixed(2)}</span>}
                 {slot.EstadoReserva && <span style={{ background: '#dbeafe', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold', color: '#1e40af' }}>{slot.EstadoReserva}</span>}
-                <button onClick={() => onAbrirDetalleReserva(slot.ID_Reserva)} title="Ver detalle"
+                <button onClick={() => onAbrirDetalleReserva(slot.ID_RESERVA)} title="Ver detalle"
                     style={{ background: 'none', border: '1px solid #93c5fd', color: '#2563eb', padding: '3px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Ver más</button>
             </div>
         );
 
         if (slot.EstadoSlot === 'DISPONIBLE') return (
-            <div key={slot.ID_Slots} style={CARD_STYLES.slotRow}>
+            <div key={slot.ID_SLOT} style={CARD_STYLES.slotRow}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>✅ {color.label}</span>
-                <span style={{ fontSize: '12px', color: '#666', fontWeight: 'bold' }}>{slot.Tipo_Precio || 'BASE'}</span>
+                <span style={{ fontSize: '12px', color: '#666', fontWeight: 'bold' }}>{slot.TIPO_PRECIO || 'BASE'}</span>
                 {accionesDisponible}
             </div>
         );
 
         if (slot.EstadoSlot === 'RESERVADO') return (
-            <div key={slot.ID_Slots} style={{ ...CARD_STYLES.slotRow, background: '#f8faff' }}>
+            <div key={slot.ID_SLOT} style={{ ...CARD_STYLES.slotRow, background: '#f8faff' }}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>👤 {color.label}</span>
                 {infoReservado}
                 <div style={CARD_STYLES.actions}>
-                    <button onClick={() => handleCambiarEstado(slot.ID_Slots, 'NO_ASISTIO')} title="Marcar como no asistió"
+                    <button onClick={() => handleCambiarEstado(slot.ID_SLOT, 'NO_ASISTIO')} title="Marcar como no asistió"
                         style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🚫 No asistió</button>
                 </div>
             </div>
         );
 
         if (slot.EstadoSlot === 'BLOQUEADO') return (
-            <div key={slot.ID_Slots} style={CARD_STYLES.slotRow}>
+            <div key={slot.ID_SLOT} style={CARD_STYLES.slotRow}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>🔒 {color.label}</span>
                 {accionesBloqueado}
@@ -237,30 +237,30 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
         );
 
         if (slot.EstadoSlot === 'OFERTA') return (
-            <div key={slot.ID_Slots} style={{ ...CARD_STYLES.slotRow, background: '#fffbe6' }}>
+            <div key={slot.ID_SLOT} style={{ ...CARD_STYLES.slotRow, background: '#fffbe6' }}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>🔥 {color.label}</span>
-                <span style={{ fontSize: '12px', color: '#92400e', fontWeight: 'bold', marginLeft: 'auto' }}>{slot.Tipo_Precio || 'BASE'}</span>
+                <span style={{ fontSize: '12px', color: '#92400e', fontWeight: 'bold', marginLeft: 'auto' }}>{slot.TIPO_PRECIO || 'BASE'}</span>
                 <div style={CARD_STYLES.actions}>
-                    <button onClick={() => handleCambiarEstado(slot.ID_Slots, 'DISPONIBLE')} title="Quitar oferta y liberar"
+                    <button onClick={() => handleCambiarEstado(slot.ID_SLOT, 'DISPONIBLE')} title="Quitar oferta y liberar"
                         style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🗑️ Quitar oferta</button>
                 </div>
             </div>
         );
 
         if (slot.EstadoSlot === 'NO_ASISTIO') return (
-            <div key={slot.ID_Slots} style={{ ...CARD_STYLES.slotRow, background: '#fef2f2' }}>
+            <div key={slot.ID_SLOT} style={{ ...CARD_STYLES.slotRow, background: '#fef2f2' }}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>🚫 {color.label}</span>
                 <div style={CARD_STYLES.actions}>
-                    <button onClick={() => handleCambiarEstado(slot.ID_Slots, 'DISPONIBLE')} title="Liberar slot"
+                    <button onClick={() => handleCambiarEstado(slot.ID_SLOT, 'DISPONIBLE')} title="Liberar slot"
                         style={{ background: '#dcfce7', color: '#16a34a', border: '1px solid #86efac', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>🔄 Reabrir slot</button>
                 </div>
             </div>
         );
 
         return (
-            <div key={slot.ID_Slots} style={CARD_STYLES.slotRow}>
+            <div key={slot.ID_SLOT} style={CARD_STYLES.slotRow}>
                 <span style={CARD_STYLES.time}>⏰ {hora}</span>
                 <span style={CARD_STYLES.badge(color)}>{color.label}</span>
                 <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: 'auto' }}>{slot.EstadoSlot}</span>
@@ -326,12 +326,12 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                         ) : (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                 {slots.filter(s => (s.CanchaNombre || 'Cancha') === ofertaMulti.cancha && s.EstadoSlot === 'DISPONIBLE').map(s => {
-                                    const hora = `${extraerHora(s.Fecha_Inicio || s.Hora_Inicio)} - ${extraerHora(s.Fecha_Fin || s.Hora_Fin)}`;
-                                    const selected = ofertaMulti.slots.includes(s.ID_Slots);
+                                    const hora = `${extraerHora(s.HORA_INICIO)} - ${extraerHora(s.HORA_FIN)}`;
+                                    const selected = ofertaMulti.slots.includes(s.ID_SLOT);
                                     return (
-                                        <label key={s.ID_Slots} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', borderRadius: '6px', border: selected ? '2px solid #ffc107' : '1px solid #ddd', background: selected ? '#fff8e1' : '#fafafa', cursor: 'pointer', fontWeight: selected ? 'bold' : 'normal' }}>
+                                        <label key={s.ID_SLOT} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', borderRadius: '6px', border: selected ? '2px solid #ffc107' : '1px solid #ddd', background: selected ? '#fff8e1' : '#fafafa', cursor: 'pointer', fontWeight: selected ? 'bold' : 'normal' }}>
                                             <input type="checkbox" checked={selected} onChange={() => setOfertaMulti({
-                                                ...ofertaMulti, slots: selected ? ofertaMulti.slots.filter(id => id !== s.ID_Slots) : [...ofertaMulti.slots, s.ID_Slots]
+                                                ...ofertaMulti, slots: selected ? ofertaMulti.slots.filter(id => id !== s.ID_SLOT) : [...ofertaMulti.slots, s.ID_SLOT]
                                             })} />
                                             {hora}
                                         </label>
@@ -443,13 +443,13 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                                                     <p style={{ padding: '14px 18px', color: '#6b7280', fontSize: '13px', margin: 0 }}>Sin horarios para este día.</p>
                                                 ) : (
                                                     dia.canchas.map(cancha => {
-                                                        const canchaRel = canchas.find(cc => cc.Nombre === cancha.Nombre || cc.ID_Cancha === cancha.ID_Cancha);
+                                                        const canchaRel = canchas.find(cc => cc.NOMBRE === cancha.NOMBRE || cc.ID_CANCHA === cancha.ID_CANCHA);
                                                         const slotsCancha = (cancha.slots || []).sort((a, b) => (a.Hora_Inicio || '').localeCompare(b.Hora_Inicio || ''));
                                                         if (slotsCancha.length === 0) return null;
                                                         return (
-                                                            <div key={cancha.ID_Cancha}>
+                                                            <div key={cancha.ID_CANCHA}>
                                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 18px 4px', borderBottom: '1px solid #f0f0f0', marginBottom: '4px' }}>
-                                                                    <h5 style={{ margin: 0, fontSize: '14px', color: '#1e2530' }}>🏟️ {cancha.Nombre}</h5>
+                                                                    <h5 style={{ margin: 0, fontSize: '14px', color: '#1e2530' }}>🏟️ {cancha.NOMBRE}</h5>
                                                                     {canchaRel && (
                                                                         <button onClick={(e) => { e.stopPropagation(); onAbrirGestionCancha(canchaRel); }} title="Gestionar horarios"
                                                                             style={{ background: '#1e2530', color: 'white', border: 'none', padding: '3px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px', fontWeight: 'bold' }}>📅 Gestionar</button>
@@ -529,7 +529,7 @@ export default function AgendaDueno({ canchas, onMensaje, onAbrirDetalleReserva,
                         /* Cards */
                         Object.keys(slotsPorCancha).map(nombreCancha => {
                             const slotsCancha = slotsPorCancha[nombreCancha];
-                            const canchaRel = canchas.find(c => c.Nombre === nombreCancha);
+                            const canchaRel = canchas.find(c => c.NOMBRE === nombreCancha);
                             const expandida = canchasExpandidas.includes(nombreCancha);
                             return (
                                 <div key={nombreCancha} style={CARD_STYLES.card}>

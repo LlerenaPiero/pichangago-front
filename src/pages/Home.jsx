@@ -1,66 +1,68 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { canchaService } from '../services/canchaService';
-import { getImageUrl } from '../utils/imageUrl';
-
-const hoy = () => new Date().toISOString().split('T')[0];
+import { getImageUrl, FALLBACK_IMG } from '../utils/imageUrl';
+import { getCanchaSlug } from '../utils/slugify';
 
 const Home = () => {
   const [canchas, setCanchas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ofertas, setOfertas] = useState([]);
   const [loadingOfertas, setLoadingOfertas] = useState(true);
-  const [ubicacion, setUbicacion] = useState('');
-  const [fecha, setFecha] = useState(hoy());
-  const [hora, setHora] = useState('');
   const [coords, setCoords] = useState(null);
-  
+  const [geoDenied, setGeoDenied] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => { setGeoDenied(true); setLoading(false); },
+        { timeout: 5000, enableHighAccuracy: false }
+      );
+    } else {
+      setGeoDenied(true);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     (async () => {
+      if (!coords && geoDenied) return;
       const filtros = {};
       if (coords) {
         filtros.lat = coords.lat;
         filtros.lng = coords.lng;
       }
       const res = await canchaService.listarCanchas(filtros);
+      if (cancelled) return;
       if (res.status === 'success') {
-        setCanchas(res.data || []);
+        const data = Array.isArray(res.data) ? res.data : [];
+        setCanchas(data.slice(0, 18));
       }
       setLoading(false);
     })();
-  }, [coords]);
+    return () => { cancelled = true; };
+  }, [coords, geoDenied]);
 
   useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setLoading(false),
-        { timeout: 5000, enableHighAccuracy: false }
-      );
-    }
-  }, []);
-
-  useEffect(() => {
+    let cancelled = false;
     (async () => {
       setLoadingOfertas(true);
       const res = await canchaService.obtenerOfertasHoy();
-      setOfertas(res.status === 'success' && res.data ? res.data : []);
+      if (cancelled) return;
+      setOfertas(res.status === 'success' && Array.isArray(res.data) ? res.data : []);
       setLoadingOfertas(false);
     })();
+    return () => { cancelled = true; };
   }, []);
 
-  const handleBuscar = () => {
-    const params = new URLSearchParams();
-    if (ubicacion) params.append('nombre', ubicacion);
-    if (fecha) params.append('fecha', fecha);
-    if (hora) params.append('hora', hora);
-    
-    navigate(`/buscar?${params.toString()}`);
-  };
+  const handleBuscar = () => navigate('/buscar');
 
-  const fotoUrl = (cancha) => getImageUrl(cancha.Fotos?.[0]?.URL_Foto);
+  const fotoUrl = (cancha) => getImageUrl(cancha.Fotos?.[0]?.URL_FOTO);
+  const imgError = (e) => { if (e.target.src !== FALLBACK_IMG) e.target.src = FALLBACK_IMG; };
 
   return (
     <div className="home-container">
@@ -69,36 +71,9 @@ const Home = () => {
         <h1>Reserva una cancha<br /><span style={{ color: 'var(--green)' }}>cerca de ti</span></h1>
         <p>Elige horario, paga con Yape y recibe confirmaci&oacute;n inmediata.</p>
 
-        <div className="search-bar">
-          <div className="search-fields">
-            <input
-              type="text"
-              placeholder="Ciudad / distrito / cancha"
-              value={ubicacion}
-              onChange={e => setUbicacion(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleBuscar()}
-              aria-label="Ubicación"
-              className="search-input-ubicacion"
-            />
-            <input
-              type="date"
-              value={fecha}
-              onChange={e => setFecha(e.target.value)}
-              aria-label="Fecha"
-              className="search-input-date"
-            />
-            <input
-              type="time"
-              value={hora}
-              onChange={e => setHora(e.target.value)}
-              aria-label="Hora (opcional)"
-              className="search-input-time"
-            />
-          </div>
-          <button className="btn-search" onClick={handleBuscar}>
-            Buscar disponibles
-          </button>
-        </div>
+        <button className="btn-search" onClick={handleBuscar}>
+          Buscar disponibles →
+        </button>
 
         {/* Trust badges */}
         <div className="trust-badges">
@@ -117,7 +92,48 @@ const Home = () => {
         </div>
       </div>
 
+      {/* CÓMO FUNCIONA */}
+      <div className="como-funciona">
+        <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '10px' }}>
+          Cómo funciona
+        </h2>
+        <div className="pasos-grid">
+          <div className="paso">
+            <div className="paso-numero">1</div>
+            <div className="paso-icono">&#128269;</div>
+            <div className="paso-titulo">Busca</div>
+            <div className="paso-desc">Encuentra canchas cerca de ti por distrito, fecha y horario.</div>
+          </div>
+          <div className="paso-divisor">
+            <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 1H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
+          </div>
+          <div className="paso">
+            <div className="paso-numero">2</div>
+            <div className="paso-icono">&#128197;</div>
+            <div className="paso-titulo">Elige horario</div>
+            <div className="paso-desc">Selecciona el día y la hora que mejor te quede.</div>
+          </div>
+          <div className="paso-divisor">
+            <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 2H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
+          </div>
+          <div className="paso">
+            <div className="paso-numero">3</div>
+            <div className="paso-icono">&#127928;</div>
+            <div className="paso-titulo">Paga y juega</div>
+            <div className="paso-desc">Paga con Yape y recibe tu confirmación al instante.</div>
+          </div>
+        </div>
+      </div>
+
       <div className="page-wrap">
+        {geoDenied && (
+          <div className="geo-invite-banner">
+            <p className="geo-invite-text">Activa tu ubicaci&oacute;n para ver canchas cercanas</p>
+            <p className="geo-invite-sub">Tambi&eacute;n puedes buscar por distrito o nombre de cancha.</p>
+            <Link to="/buscar" className="geo-invite-btn">Explorar todas las canchas</Link>
+          </div>
+        )}
+
         {/* OFERTAS — solo si hay ofertas reales */}
         {ofertas.length > 0 && (
           <div className="ofertas-section">
@@ -132,25 +148,31 @@ const Home = () => {
             </div>
             <div className="ofertas-scroll">
               {ofertas.map((of, i) => {
-                const fotoOferta = getImageUrl(of.Foto_URL || of.Fotos?.[0]?.URL_Foto);
+                const fotoOferta = getImageUrl(of.Fotos?.[0]?.URL_FOTO);
                 const tieneDto = of.Precio_Original > 0 && of.Precio_Oferta > 0;
+                const id = of.ID_CANCHA ?? of.ID_Cancha ?? i;
                 return (
                   <Link
-                    key={`${of.ID_Cancha}-${of.Hora_Inicio || ''}-${of.Hora_Fin || ''}-${i}`}
-                    to={`/cancha/${of.ID_Cancha}`}
+                    key={`${id}-${of.Hora_Inicio || ''}-${of.Hora_Fin || ''}-${i}`}
+                    to={`/cancha/${getCanchaSlug(of)}`}
                     className="oferta-card"
                   >
                     {fotoOferta && (
-                      <img src={fotoOferta} alt={of.Nombre} className="oferta-img" />
+                      <img src={fotoOferta} alt={of.NOMBRE} className="oferta-img" onError={imgError} />
                     )}
                     <div className="oferta-body">
                       <div className="oferta-meta">
-                        <span>{of.Distrito || of.Dia_Semana || ''}</span>
+                        <span>{of.DISTRITO || of.Dia_Semana || ''}</span>
+                        {of.Rating > 0 && (
+                          <span className="oferta-rating">
+                            {of.Rating.toFixed(1)} &#9733;
+                          </span>
+                        )}
                         <span className="oferta-horario">
                           {of.Hora_Inicio?.substring(0, 5)} &mdash; {of.Hora_Fin?.substring(0, 5)}
                         </span>
                       </div>
-                      <div className="oferta-nombre">{of.Nombre}</div>
+                      <div className="oferta-nombre">{of.NOMBRE}</div>
                       <div className="oferta-footer">
                         {tieneDto ? (
                           <>
@@ -189,7 +211,7 @@ const Home = () => {
           <div className="section-header">
             <h2 className="section-title">Canchas recomendadas cerca de ti</h2>
             <p className="section-sub">
-              {loading ? 'Cargando...' : `${canchas.length} canchas disponibles`}
+              {loading ? 'Cargando...' : `Mostrando ${canchas.length} canchas cerca de ti`}
             </p>
           </div>
 
@@ -201,24 +223,26 @@ const Home = () => {
             </div>
           ) : canchas.length === 0 ? (
             <div className="empty-state">
-              <p>No hay canchas disponibles en este momento.</p>
+              <p>No encontramos canchas cerca de ti.</p>
+              <p style={{ color: '#4b5563', fontSize: '14px', marginTop: '8px' }}>Prueba ampliando la b&uacute;squeda o revisa m&aacute;s tarde.</p>
             </div>
           ) : (
             <div className="cards-grid">
-              {canchas.map((cancha) => {
+              {canchas.map((cancha, i) => {
                 const r = ratingRedondeado(cancha);
+                const id = cancha.ID_CANCHA ?? cancha.ID_Cancha ?? i;
                 return (
                   <Link
-                    to={`/cancha/${cancha.ID_Cancha}`}
-                    key={cancha.ID_Cancha}
+                    to={`/cancha/${getCanchaSlug(cancha)}`}
+                    key={id}
                     style={{ textDecoration: 'none', color: 'inherit' }}
                   >
                     <div className="cancha-card">
-                      <img className="cancha-card-img" src={fotoUrl(cancha)} alt={cancha.Nombre} loading="lazy" />
+                      <img className="cancha-card-img" src={fotoUrl(cancha)} alt={cancha.NOMBRE} loading="lazy" onError={imgError} />
                       <div className="cancha-card-body">
                         <div className="cancha-card-distrito">{cancha.Distrito}</div>
-                        <div className="cancha-card-nombre">{cancha.Nombre}</div>
-                        <div className="cancha-card-tipo">{cancha.Descripcion || 'Cancha deportiva'}</div>
+                        <div className="cancha-card-nombre">{cancha.NOMBRE}</div>
+                        <div className="cancha-card-tipo">{cancha.DESCRIPCION || 'Cancha deportiva'}</div>
                       </div>
                       <div className="cancha-card-footer">
                         <div className="cancha-card-precio">S/ {Number(cancha.Precio_Base).toFixed(2)} <small>/ hora</small></div>
@@ -229,7 +253,7 @@ const Home = () => {
                           </div>
                         )}
                       </div>
-                      <div className="cancha-card-cta"><span className="cta-text">Ver horarios</span></div>
+                      <div className="cancha-card-cta-visible"><span className="cta-text">Ver horarios</span></div>
                     </div>
                   </Link>
                 );
@@ -238,40 +262,7 @@ const Home = () => {
           )}
         </div>
 
-        {/* CÓMO FUNCIONA */}
-        <div className="como-funciona">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>
-            C&oacute;mo funciona
-          </h2>
-          <div className="pasos-grid">
-            <div className="paso">
-              <div className="paso-numero">1</div>
-              <div className="paso-icono">&#128269;</div>
-              <div className="paso-titulo">Busca</div>
-              <div className="paso-desc">Encuentra canchas cerca de ti por distrito, fecha y horario.</div>
-            </div>
-            <div className="paso-divisor">
-              <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 1H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
-            </div>
-            <div className="paso">
-              <div className="paso-numero">2</div>
-              <div className="paso-icono">&#128197;</div>
-              <div className="paso-titulo">Elige horario</div>
-              <div className="paso-desc">Selecciona el d&iacute;a y la hora que mejor te quede.</div>
-            </div>
-            <div className="paso-divisor">
-              <svg width="40" height="2" viewBox="0 0 40 2" fill="none"><path d="M0 2H40" stroke="#C8CDD6" strokeWidth="2"/></svg>
-            </div>
-            <div className="paso">
-              <div className="paso-numero">3</div>
-              <div className="paso-icono">&#127928;</div>
-              <div className="paso-titulo">Paga y juega</div>
-              <div className="paso-desc">Paga con Yape y recibe tu confirmaci&oacute;n al instante.</div>
-            </div>
-          </div>
-        </div>
       </div>
-
 
     </div>
   );

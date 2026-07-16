@@ -121,35 +121,35 @@ export default function ModalDetalleReserva({ idReserva, onCerrar }) {
 
                             <SectionCard title="Cancha" icon="🏟️">
                                 <InfoRow label="Cancha" value={reservaDetalle.CanchaNombre} />
-                                <InfoRow label="Dirección" value={`${reservaDetalle.Direccion || ''}, ${reservaDetalle.Distrito || ''}`} />
+                                <InfoRow label="Dirección" value={`${reservaDetalle.DIRECCION || ''}, ${reservaDetalle.DISTRITO || ''}`} />
                                 <InfoRow label="Fecha" value={reservaDetalle.FechaSlot ? new Date(reservaDetalle.FechaSlot + 'T12:00:00').toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '—'} />
                                 <InfoRow label="Horario" value={`${reservaDetalle.Hora_Inicio} — ${reservaDetalle.Hora_Fin}`} />
                             </SectionCard>
 
                             <SectionCard title="Pago" icon="💳">
-                                <InfoRow label="Precio Base" value={`S/ ${parseFloat(reservaDetalle.Precio_Base || 0).toFixed(2)}`} />
-                                <InfoRow label="Comisión QR" value={`S/ ${parseFloat(reservaDetalle.Comi_Qr || 0).toFixed(2)}`} />
+                                <InfoRow label="Precio Base" value={`S/ ${parseFloat(reservaDetalle.Precio_Base || reservaDetalle.PRECIO_BASE || 0).toFixed(2)}`} />
+                                <InfoRow label="Comisión QR" value={`S/ ${parseFloat(reservaDetalle.Comi_Qr || reservaDetalle.COMISION_QR || 0).toFixed(2)}`} />
                                 <div style={{
                                     display: 'flex', justifyContent: 'space-between', padding: '8px 0 0 0',
                                     fontSize: '15px', fontWeight: '700', color: '#059669',
                                     borderTop: '2px solid #d1fae5', marginTop: '4px'
                                 }}>
                                     <span>Total</span>
-                                    <span>S/ {parseFloat(reservaDetalle.Monto_Total || 0).toFixed(2)}</span>
+                                    <span>S/ {parseFloat(reservaDetalle.MONTO_TOTAL || 0).toFixed(2)}</span>
                                 </div>
                                 {reservaDetalle.MontoPagado > 0 && (
                                     <InfoRow label="Monto Pagado" value={`S/ ${parseFloat(reservaDetalle.MontoPagado).toFixed(2)}`} />
                                 )}
-                                {reservaDetalle.Fecha_Proces && (
-                                    <InfoRow label="Procesado" value={new Date(reservaDetalle.Fecha_Proces).toLocaleString('es-PE')} />
+                                {reservaDetalle.FECHA_PROCESO && (
+                                    <InfoRow label="Procesado" value={new Date(reservaDetalle.FECHA_PROCESO).toLocaleString('es-PE')} />
                                 )}
                             </SectionCard>
 
                             {reservaDetalle.EstadoReserva === 'CANCELADA' && (
                                 <SectionCard title="Cancelación" icon="🚫">
-                                    <InfoRow label="Fecha" value={reservaDetalle.Fecha_Cancel ? new Date(reservaDetalle.Fecha_Cancel).toLocaleString('es-PE') : '—'} />
-                                    <InfoRow label="Zona" value={reservaDetalle.Zona_Cancela} />
-                                    <InfoRow label="% Reembolso" value={`${reservaDetalle.Porcen_Reemb || 0}%`} />
+                                    <InfoRow label="Fecha" value={reservaDetalle.FECHA_CANCELADA ? new Date(reservaDetalle.FECHA_CANCELADA).toLocaleString('es-PE') : '—'} />
+                                    <InfoRow label="Zona" value={reservaDetalle.CANCELADO_POR} />
+                                    <InfoRow label="% Reembolso" value={`${reservaDetalle.PORCENTAJE_REEMB || 0}%`} />
                                 </SectionCard>
                             )}
 

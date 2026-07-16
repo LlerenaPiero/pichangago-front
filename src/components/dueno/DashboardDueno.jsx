@@ -6,6 +6,9 @@ const fechaHoy = hoy.toISOString().split('T')[0];
 const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 const fechaFormateada = hoy.toLocaleDateString('es-PE', opcionesFecha);
 
+const PLAN_NAMES = { BASICO: 'Básico', PRO: 'Pro', PREMIUM: 'Premium' };
+const PLAN_COLORS = { BASICO: '#6b7280', PRO: '#008060', PREMIUM: '#8b5cf6' };
+
 function extraerHora(fecha) {
     if (!fecha) return '--:--';
     if (fecha.includes('T')) return fecha.split('T')[1].slice(0, 5);
@@ -15,22 +18,34 @@ function extraerHora(fecha) {
 export default function DashboardDueno() {
     const [dashboard, setDashboard] = useState(null);
     const [reservasHoy, setReservasHoy] = useState([]);
+    const [suscripcion, setSuscripcion] = useState(null);
+    const [planes, setPlanes] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         (async () => {
-            const [res, resAgenda] = await Promise.all([
+            const [res, resAgenda, resSuscripcion, resPlanes] = await Promise.all([
                 duenoService.obtenerDashboard(),
-                duenoService.obtenerAgendaDiaria(fechaHoy)
+                duenoService.obtenerAgendaDiaria(fechaHoy),
+                duenoService.obtenerSuscripcion(),
+                duenoService.obtenerPlanes()
             ]);
             setDashboard(res.status === 'success' && res.data ? res.data : null);
 
             if (resAgenda.status === 'success' && resAgenda.data) {
                 const reservados = resAgenda.data
                     .filter(s => s.EstadoSlot === 'RESERVADO' && s.JugadorNombre)
-                    .sort((a, b) => (a.Hora_Inicio || a.Fecha_Inicio || '').localeCompare(b.Hora_Inicio || b.Fecha_Inicio || ''));
+                    .sort((a, b) => (a.HORA_INICIO || a.Fecha_Inicio || '').localeCompare(b.HORA_INICIO || b.Fecha_Inicio || ''));
                 setReservasHoy(reservados);
             }
+
+            if (resSuscripcion.status === 'success' && resSuscripcion.data) {
+                setSuscripcion(resSuscripcion.data);
+            }
+            if (resPlanes.status === 'success' && resPlanes.data) {
+                setPlanes(resPlanes.data);
+            }
+
             setLoading(false);
         })();
     }, []);
@@ -99,9 +114,9 @@ export default function DashboardDueno() {
                             </thead>
                             <tbody>
                                 {reservasHoy.map(slot => (
-                                    <tr key={slot.ID_Slots} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                    <tr key={slot.ID_SLOT} style={{ borderBottom: '1px solid #f3f4f6' }}>
                                         <td style={{ padding: '12px 16px', fontWeight: '600', whiteSpace: 'nowrap' }}>
-                                            ⏰ {extraerHora(slot.Hora_Inicio || slot.Fecha_Inicio)} - {extraerHora(slot.Hora_Fin || slot.Fecha_Fin)}
+                                            ⏰ {extraerHora(slot.HORA_INICIO)} - {extraerHora(slot.HORA_FIN)}
                                         </td>
                                         <td style={{ padding: '12px 16px' }}>{slot.CanchaNombre || '—'}</td>
                                         <td style={{ padding: '12px 16px' }}>
@@ -109,7 +124,7 @@ export default function DashboardDueno() {
                                             {slot.JugadorTelefono && <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>📞 {slot.JugadorTelefono}</span>}
                                         </td>
                                         <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: '600', color: '#059669' }}>
-                                            S/ {Number(slot.Monto_Total || 0).toFixed(2)}
+                                            S/ {Number(slot.MONTO_TOTAL || 0).toFixed(2)}
                                         </td>
                                         <td style={{ padding: '12px 16px', textAlign: 'center' }}>
                                             <span style={{
@@ -134,6 +149,48 @@ export default function DashboardDueno() {
                     <div style={{ fontSize: '40px', marginBottom: '8px' }}>📭</div>
                     <p style={{ color: '#6b7280', fontWeight: '500' }}>No hay reservas para hoy</p>
                     <p style={{ color: '#6b7280', fontSize: '13px', margin: 0 }}>Los próximos clientes aparecerán aquí automáticamente.</p>
+                </div>
+            )}
+
+            {/* Estado de suscripción */}
+            {suscripcion && (
+                <div style={{
+                    border: `1px solid ${PLAN_COLORS[suscripcion.Plan] || '#008060'}33`,
+                    borderRadius: '12px', padding: '20px 24px',
+                    background: `linear-gradient(135deg, ${PLAN_COLORS[suscripcion.Plan] || '#008060'}08 0%, #ffffff 100%)`,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)', marginBottom: '24px'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '24px' }}>{suscripcion.Plan === 'PREMIUM' ? '⭐' : suscripcion.Plan === 'PRO' ? '🌟' : '📦'}</span>
+                            <div>
+                                <h4 style={{ margin: 0, color: '#1f2937', fontSize: '15px' }}>Plan {PLAN_NAMES[suscripcion.Plan] || suscripcion.Plan}</h4>
+                                <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#6b7280' }}>
+                                    {suscripcion.Cantidad_Canchas} cancha{suscripcion.Cantidad_Canchas !== 1 ? 's' : ''} permitida{suscripcion.Cantidad_Canchas !== 1 ? 's' : ''}
+                                    {suscripcion.Precio_Mensual > 0 && ` · S/ ${Number(suscripcion.Precio_Mensual).toFixed(2)}/mes`}
+                                </p>
+                            </div>
+                        </div>
+                        <span style={{
+                            padding: '4px 12px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold',
+                            background: suscripcion.Estado === 'ACTIVO' ? '#d4edda' : '#fff3cd',
+                            color: suscripcion.Estado === 'ACTIVO' ? '#155724' : '#856404'
+                        }}>{suscripcion.Estado}</span>
+                    </div>
+                    {planes.length > 0 && suscripcion.Plan !== 'PREMIUM' && (
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '4px' }}>
+                            {planes.filter(p => p.plan !== suscripcion.Plan).map(p => (
+                                <a key={p.plan} href="/panel-dueno"
+                                    style={{
+                                        padding: '7px 14px', borderRadius: '8px', textDecoration: 'none',
+                                        background: p.plan === 'PREMIUM' ? '#8b5cf6' : p.plan === 'PRO' ? '#008060' : '#6b7280',
+                                        color: 'white', fontWeight: 600, fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px'
+                                    }}>
+                                    Mejorar a {PLAN_NAMES[p.plan] || p.plan} (S/ {Number(p.precio).toFixed(2)})
+                                </a>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 

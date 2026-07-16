@@ -1,9 +1,11 @@
+import { eraseSessionCookie } from './cookies';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const getToken = () => localStorage.getItem('token');
 const getRefreshToken = () => localStorage.getItem('refreshToken');
 const setToken = (token) => localStorage.setItem('token', token);
-const clearSession = () => { localStorage.clear(); window.location.href = '/'; };
+const clearSession = () => { localStorage.clear(); eraseSessionCookie(); window.location.href = '/'; };
 
 function buildOptions(options = {}) {
   const token = getToken();

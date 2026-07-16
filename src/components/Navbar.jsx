@@ -43,9 +43,9 @@ const Navbar = ({ user, onLogout, onOpenLogin }) => {
           </button>
         ) : (
           <>
-            {user.role === 'JUGADOR' && (
-              <Link to="/mis-reservas" className={`nav-link ${isActive('/mis-reservas')}`} onClick={() => setIsOpen(false)}>
-                Mis Reservas
+            {(user.role === 'CLIENTE') && (
+              <Link to="/panel-jugador" className={`nav-link ${isActive('/panel-jugador')}`} onClick={() => setIsOpen(false)}>
+                Panel
               </Link>
             )}
 

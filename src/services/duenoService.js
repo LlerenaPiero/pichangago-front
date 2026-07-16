@@ -13,10 +13,12 @@ const buildFormData = (data, file, fileFieldName = 'foto') => {
 
 export const duenoService = {
     registrarCancha: async (datosCancha, fotoFile = null) => {
+        const payload = { ...datosCancha };
+        if (payload.tipoSuperficie === '') delete payload.tipoSuperficie;
         const response = await apiFetch('/api/dueno/canchas', {
             method: 'POST',
             headers: {},
-            body: buildFormData(datosCancha, fotoFile)
+            body: buildFormData(payload, fotoFile)
         });
         return response.json();
     },
@@ -162,24 +164,53 @@ export const duenoService = {
     },
 
     obtenerSaldoPendiente: async () => {
-        const response = await apiFetch('/api/dueno/reportes/saldo-pendiente');
+        const response = await apiFetch('/api/dueno/saldo-pendiente');
         return response.json();
     },
 
     obtenerHistorialLiquidaciones: async () => {
-        const response = await apiFetch('/api/dueno/reportes/liquidaciones');
+        const response = await apiFetch('/api/dueno/historial-liquidaciones');
         return response.json();
     },
 
     obtenerEstadisticasOcupacion: async (mes, anio) => {
-        const response = await apiFetch(`/api/dueno/reportes/ocupacion?mes=${mes}&anio=${anio}`);
+        const response = await apiFetch(`/api/dueno/estadisticas/ocupacion?mes=${mes}&anio=${anio}`);
+        return response.json();
+    },
+
+    obtenerSuscripcion: async () => {
+        const response = await apiFetch('/api/dueno/suscripcion');
+        return response.json();
+    },
+
+    obtenerPlanes: async () => {
+        const response = await apiFetch('/api/dueno/planes');
+        return response.json();
+    },
+
+    obtenerPagos: async (filtros = {}) => {
+        const params = new URLSearchParams();
+        if (filtros.fecha_desde) params.append('fecha_desde', filtros.fecha_desde);
+        if (filtros.fecha_hasta) params.append('fecha_hasta', filtros.fecha_hasta);
+        if (filtros.estado) params.append('estado', filtros.estado);
+        const qs = params.toString();
+        const response = await apiFetch(`/api/dueno/pagos${qs ? '?' + qs : ''}`);
+        return response.json();
+    },
+
+    obtenerReembolsos: async (filtros = {}) => {
+        const params = new URLSearchParams();
+        if (filtros.fecha_desde) params.append('fecha_desde', filtros.fecha_desde);
+        if (filtros.fecha_hasta) params.append('fecha_hasta', filtros.fecha_hasta);
+        const qs = params.toString();
+        const response = await apiFetch(`/api/dueno/reembolsos${qs ? '?' + qs : ''}`);
         return response.json();
     },
 
     obtenerHistorialReservas: async (filtros = {}) => {
         const params = new URLSearchParams();
-        if (filtros.fecha_desde) params.append('fecha_inicio', filtros.fecha_desde);
-        if (filtros.fecha_hasta) params.append('fecha_fin', filtros.fecha_hasta);
+        if (filtros.fecha_desde) params.append('fecha_desde', filtros.fecha_desde);
+        if (filtros.fecha_hasta) params.append('fecha_hasta', filtros.fecha_hasta);
         if (filtros.estado) params.append('estado', filtros.estado);
         const qs = params.toString();
         const response = await apiFetch(`/api/dueno/reservas/historial${qs ? '?' + qs : ''}`);

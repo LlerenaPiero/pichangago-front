@@ -58,10 +58,10 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
             setFinanData(resFinan.data);
             setForm(prev => ({
                 ...prev,
-                ruc: resFinan.data.Ruc || '',
-                razonSocial: resFinan.data.Razon_Social || '',
+                ruc: resFinan.data.RUC || '',
+                razonSocial: resFinan.data.RAZON_SOCIAL || '',
                 cci: resFinan.data.CCI || '',
-                banco: resFinan.data.Banco || ''
+                banco: resFinan.data.BANCO || ''
             }));
         } else {
             setFinanData(null);
@@ -94,13 +94,15 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
         if (form.telefono !== (userData?.Telefono || '')) personalCambio.telefono = form.telefono;
 
         const finanCambio = {};
-        if (form.ruc !== (finanData?.Ruc || '')) finanCambio.ruc = form.ruc;
-        if (form.razonSocial !== (finanData?.Razon_Social || '')) finanCambio.razonSocial = form.razonSocial;
+        if (form.ruc !== (finanData?.RUC || '')) finanCambio.ruc = form.ruc;
+        if (form.razonSocial !== (finanData?.RAZON_SOCIAL || '')) finanCambio.razonSocial = form.razonSocial;
         if (form.cci !== (finanData?.CCI || '')) finanCambio.cci = form.cci;
-        if (form.banco && form.banco !== (finanData?.Banco || '')) finanCambio.banco = form.banco;
+        if (form.banco && form.banco !== (finanData?.BANCO || '')) finanCambio.banco = form.banco;
 
         if (Object.keys(personalCambio).length === 0 && Object.keys(finanCambio).length === 0) {
-            return setMsj({ texto: '✅ No hay cambios que guardar.', tipo: 'success' });
+            setMsj({ texto: '✅ No hay cambios que guardar.', tipo: 'success' });
+            if (onActualizar) onActualizar();
+            return;
         }
 
         if (personalCambio.telefono && !/^\d{9}$/.test(personalCambio.telefono)) {
@@ -160,7 +162,7 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
     const iniciales = userData ? ((userData.Nombre?.[0] || '') + (userData.Apellido?.[0] || '')).toUpperCase() : 'D';
     const email = userData?.Correo || '';
     const telefono = userData?.Telefono || '';
-    const estadoDueno = finanData?.Estado || finanData?.EstadoDueño || userData?.Estado || '—';
+    const estadoDueno = finanData?.ESTADO || finanData?.ESTADO_DUENO || userData?.ESTADO || '—';
 
     const msgColors = { success: '#d4edda', warning: '#fff3cd', error: '#fee2e2' };
     const msgTextColors = { success: 'green', warning: 'orange', error: 'red' };
@@ -293,9 +295,9 @@ export default function PerfilDueno({ version, onActualizar, modoOnboarding }) {
                             fontWeight: '600'
                         }}>{estadoDueno}</span>
                     </span>
-                    {finanData?.Fecha_Afiliacion && (
+                    {finanData?.FECHA_AFILIACION && (
                         <span style={{ fontSize: '13px', color: '#6b7280' }}>
-                            📅 Afiliado desde: {new Date(finanData.Fecha_Afiliacion).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            📅 Afiliado desde: {new Date(finanData.FECHA_AFILIACION).toLocaleDateString('es-PE', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </span>
                     )}
                 </div>

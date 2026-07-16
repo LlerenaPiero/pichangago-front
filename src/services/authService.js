@@ -1,4 +1,12 @@
+import { eraseSessionCookie } from '../utils/cookies';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const storeSession = (data) => {
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('refreshToken', data.refreshToken);
+  localStorage.setItem('usuario', JSON.stringify(data.usuario));
+};
 
 export const authService = {
   
@@ -8,7 +16,7 @@ export const authService = {
     if (!userStr) return null;
     try {
       return JSON.parse(userStr);
-    } catch (e) {
+    } catch {
       return null;
     }
   },
@@ -39,18 +47,32 @@ export const authService = {
       if (!response.ok) {
         const err = new Error(data.error || 'Error en el login');
         err.status = response.status;
+        err.emailNoVerificado = data.emailNoVerificado;
         throw err;
       }
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      }
+      if (data.token) storeSession(data);
       return data;
     } catch (error) {
       console.error('[authService.login]', { error: error.message, status: error.status });
       throw error;
     }
+  },
+
+  googleLogin: async (idToken) => {
+    const response = await fetch(`${API_URL}/api/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      const err = new Error(data.error || 'Error en autenticación con Google');
+      err.status = response.status;
+      err.emailNoVerificado = data.emailNoVerificado;
+      throw err;
+    }
+    if (data.token) storeSession(data);
+    return data;
   },
 
   logout: async () => {
@@ -67,8 +89,19 @@ export const authService = {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('usuario');
-      window.location.href = '/';
+      eraseSessionCookie();
     }
+  },
+
+  resendVerification: async (email) => {
+    const response = await fetch(`${API_URL}/api/resend-verification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al reenviar verificación');
+    return data;
   },
 
   refreshAccessToken: async () => {

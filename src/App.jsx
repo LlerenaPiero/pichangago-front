@@ -4,24 +4,29 @@ import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
-import { authService } from './services/authService';
-
-
 import { getSessionCookie, setSessionCookie, eraseSessionCookie } from './utils/cookies';
+import { authService } from './services/authService';
 
 const Home = lazy(() => import('./pages/Home'));
 const Buscar = lazy(() => import('./pages/Buscar'));
 const CanchaDetail = lazy(() => import('./pages/CanchaDetail'));
 const MisReservas = lazy(() => import('./pages/MisReservas'));
+const PanelJugador = lazy(() => import('./pages/PanelJugador'));
+const PerfilJugador = lazy(() => import('./pages/PerfilJugador'));
 const SystemStatus = lazy(() => import('./pages/SystemStatus'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const EmailVerificado = lazy(() => import('./pages/EmailVerificado'));
 
 const PanelDueno = lazy(() => import('./pages/dueno/PanelDueno'));
 const DuenoOnboarding = lazy(() => import('./pages/dueno/DuenoOnboarding'));
 const RegistroCanchaForm = lazy(() => import('./pages/dueno/RegistroCanchaForm'));
 const PerfilFinanciero = lazy(() => import('./pages/dueno/PerfilFinanciero'));
 
+const ROLES_JUGADOR = ['CLIENTE'];
 const ROL_DUENO = 'DUENO';
+const ROLES_DUENO = ['DUENO', 'DUEÑO'];
+
+const normalizeRole = (role) => ROLES_DUENO.includes(role) ? 'DUENO' : role;
 
 const ProtectedRoute = ({ allowedRoles, user }) => {
   if (!user) return <Navigate to="/" replace />;
@@ -61,15 +66,21 @@ function AppContent() {
   }, [user, navigate]);
 
   const handleLoginSuccess = (userData) => {
-    setUser(userData);
-    setSessionCookie(userData);
+    const normalized = { ...userData, role: normalizeRole(userData.role) };
+    setUser(normalized);
+    setSessionCookie(normalized);
     setIsModalOpen(false);
-    if (userData.role === ROL_DUENO) {
+    if (normalized.role === ROL_DUENO) {
       navigate('/panel-dueno');
+    } else if (ROLES_JUGADOR.includes(normalized.role)) {
+      navigate('/panel-jugador');
+    } else {
+      navigate('/');
     }
   };
 
-const logout = () => {
+const logout = async () => {
+    await authService.logout();
     setUser(null);
     eraseSessionCookie();
     navigate('/');
@@ -83,6 +94,7 @@ const logout = () => {
       <Navbar user={user} onLogout={logout} onOpenLogin={() => setIsModalOpen(true)} />
 
       <AuthModal
+        key={isModalOpen ? 'open' : 'closed'}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onLogin={handleLoginSuccess}
@@ -94,12 +106,15 @@ const logout = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/buscar" element={<Buscar />} />
+          <Route path="/email-verificado" element={<EmailVerificado />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/cancha/:id" element={<CanchaDetail onOpenLogin={() => setIsModalOpen(true)} />} />
+          <Route path="/cancha/:slug" element={<CanchaDetail onOpenLogin={() => setIsModalOpen(true)} />} />
           <Route path="/status" element={<SystemStatus />} />
 
-          <Route element={<ProtectedRoute user={user} allowedRoles={['JUGADOR']} />}>
+          <Route element={<ProtectedRoute user={user} allowedRoles={ROLES_JUGADOR} />}>
+            <Route path="/panel-jugador" element={<PanelJugador />} />
             <Route path="/mis-reservas" element={<MisReservas />} />
+            <Route path="/perfil" element={<PerfilJugador />} />
           </Route>
 
           <Route element={<ProtectedRoute user={user} allowedRoles={[ROL_DUENO]} />}>

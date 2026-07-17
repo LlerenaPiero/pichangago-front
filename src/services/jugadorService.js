@@ -106,10 +106,12 @@ export const jugadorService = {
 
   cambiarPassword: async ({ currentPassword, newPassword, confirmNewPassword }) => {
     try {
+      const body = { newPassword, confirmNewPassword };
+      if (currentPassword) body.currentPassword = currentPassword;
       const res = await apiFetch('/api/jugador/cambiar-contrasena', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newPassword, confirmNewPassword }),
+        body: JSON.stringify(body),
       });
       return safeJson(res);
     } catch {

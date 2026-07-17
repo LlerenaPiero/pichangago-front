@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { canchaService } from '../services/canchaService';
 import { getImageUrl, FALLBACK_IMG } from '../utils/imageUrl';
 import { authService } from '../services/authService';
 import { jugadorService } from '../services/jugadorService';
+import { emit, on, off } from '../services/socket';
 
 const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
@@ -126,6 +127,49 @@ const CanchaDetail = ({ onOpenLogin }) => {
         if (cancha) cargarReviews();
     }, [cancha]);
 
+    const canchaIdRef = useRef(null);
+    useEffect(() => {
+        if (!cancha) return;
+        canchaIdRef.current = cancha.ID_CANCHA;
+        emit('unirse:cancha', { idCancha: cancha.ID_CANCHA });
+        return () => emit('salir:cancha', { idCancha: cancha.ID_CANCHA });
+    }, [cancha]);
+
+    useEffect(() => {
+        const handler = (data) => {
+            if (data.fecha === fechaSeleccionada() && canchaIdRef.current === data.idCancha) {
+                setSlotsDelDia(prev => prev.map(s =>
+                    data.slotsReservados?.includes(s.ID_SLOT)
+                        ? { ...s, EstadoSlot: 'RESERVADO' }
+                        : s
+                ));
+                setSelectedSlots(prev =>
+                    prev.filter(s => !data.slotsReservados?.includes(s.ID_SLOT))
+                );
+            }
+        };
+        on('slot:actualizado', handler);
+        return () => off('slot:actualizado');
+    }, [selectedDayIndex]);
+
+    const [estadoCancha, setEstadoCancha] = useState(null);
+    useEffect(() => {
+        if (!cancha) return;
+        setEstadoCancha(null);
+        const handler = (data) => {
+            if (data.idCancha === cancha.ID_CANCHA) {
+                setEstadoCancha(data.estado);
+                if (data.estado !== 'DISPONIBLE') {
+                    setSelectedSlots([]);
+                }
+            }
+        };
+        on('cancha:estado', handler);
+        return () => off('cancha:estado');
+    }, [cancha]);
+    const estadoRef = useRef(estadoCancha);
+    useEffect(() => { estadoRef.current = estadoCancha; });
+
     const obtenerPrecioSlot = (slot) => {
         if (!cancha) return 0;
         const precio = slot.Precio ?? (
@@ -228,12 +272,22 @@ const CanchaDetail = ({ onOpenLogin }) => {
             });
 
             if (response.status === 'success') {
+                setSelectedSlots([]);
                 setStep(2);
             } else {
-                alert(response.error || 'Error al procesar la reserva.');
+                const msg = response.error || 'Error al procesar la reserva.';
+                if (msg.includes('mantenimiento') || msg.includes('MANTENIMIENTO')) {
+                    showToast('⛔ La cancha no está disponible (en mantenimiento).', 'error');
+                } else if (msg.includes('ocupados') || msg.includes('ocupado') || msg.includes('SLOT_NO_DISPONIBLE')) {
+                    showToast('⛔ Alguien acaba de ocupar ese horario. Refresca la página.', 'error');
+                    const res = await canchaService.obtenerSlots(cancha.ID_CANCHA, fechaSeleccionada());
+                    if (res.status === 'success') setSlotsDelDia(res.data);
+                } else {
+                    alert(msg);
+                }
             }
-        } catch (error) {
-            alert(error.message || 'Error de red. Inténtalo de nuevo.');
+        } catch {
+            showToast('Error de red. Inténtalo de nuevo.', 'error');
         } finally {
             setIsProcessing(false);
         }
@@ -423,6 +477,14 @@ const CanchaDetail = ({ onOpenLogin }) => {
                 </div>
 
                 <div className="reserva-panel">
+                    {(estadoCancha && estadoCancha !== 'DISPONIBLE') && (
+                        <div style={{
+                            background: '#fef2f2', color: '#991b1b', padding: '12px 16px', borderRadius: '10px',
+                            marginBottom: '16px', border: '1px solid #fecaca', fontSize: '14px', fontWeight: 600, textAlign: 'center'
+                        }}>
+                            ⛔ Cancha en mantenimiento
+                        </div>
+                    )}
                     <h3 className="reserva-panel-title">Selecciona tu horario</h3>
                     <p className="reserva-panel-sub">Elige un horario disponible para continuar con tu reserva.</p>
 

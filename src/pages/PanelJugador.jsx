@@ -61,6 +61,7 @@ const PanelJugador = () => {
   const [passwordModal, setPasswordModal] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [passwordSaving, setPasswordSaving] = useState(false);
+  const [esGoogleAuth, setEsGoogleAuth] = useState(false);
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
@@ -130,6 +131,12 @@ const PanelJugador = () => {
   useEffect(() => {
     if (tabActiva === 'reservas') cargarReservas(1);
   }, [debouncedSearch, reservaTab, tabActiva]);
+
+  useEffect(() => {
+    jugadorService.obtenerPerfil().then(res => {
+      if (res?.data?.esGoogleAuth === true) setEsGoogleAuth(true);
+    });
+  }, []);
 
   const handleCancelarReserva = async () => {
     if (!cancelModal) return;
@@ -222,20 +229,29 @@ const PanelJugador = () => {
       showToast('Las contraseñas no coinciden.', 'error');
       return;
     }
-    if (passwordForm.newPassword.length < 6) {
-      showToast('La nueva contraseña debe tener al menos 6 caracteres.', 'error');
+    const pwd = passwordForm.newPassword;
+    const pwdErrors = [];
+    if (pwd.length < 8) pwdErrors.push('Mínimo 8 caracteres');
+    if (!/[A-Z]/.test(pwd)) pwdErrors.push('una mayúscula');
+    if (!/[a-z]/.test(pwd)) pwdErrors.push('una minúscula');
+    if (!/[0-9]/.test(pwd)) pwdErrors.push('un número');
+    if (!/[^A-Za-z0-9]/.test(pwd)) pwdErrors.push('un carácter especial');
+    if (pwdErrors.length) {
+      showToast('La contraseña debe tener: ' + pwdErrors.join(', '), 'error');
       return;
     }
     setPasswordSaving(true);
-    const res = await jugadorService.cambiarPassword({
-      currentPassword: passwordForm.currentPassword,
+    const body = {
+      ...(esGoogleAuth ? {} : { currentPassword: passwordForm.currentPassword }),
       newPassword: passwordForm.newPassword,
       confirmNewPassword: passwordForm.confirmPassword,
-    });
+    };
+    const res = await jugadorService.cambiarPassword(body);
     if (res.status === 'success') {
-      showToast('Contraseña actualizada correctamente.');
+      showToast(esGoogleAuth ? 'Contraseña establecida correctamente. Ya puedes iniciar sesión con tu nueva contraseña.' : 'Contraseña actualizada correctamente.');
       setPasswordModal(false);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setEsGoogleAuth(false);
     } else {
       showToast(res.error || 'Error al cambiar contraseña.', 'error');
     }
@@ -281,6 +297,26 @@ const PanelJugador = () => {
   };
 
   const tabs = ['resumen', 'reservas', 'perfil'];
+
+  const pwdValidation = (() => {
+    const p = passwordForm.newPassword;
+    const errors = [];
+    if (p.length < 8) errors.push('Mínimo 8 caracteres');
+    if (!/[A-Z]/.test(p)) errors.push('Una mayúscula');
+    if (!/[a-z]/.test(p)) errors.push('Una minúscula');
+    if (!/[0-9]/.test(p)) errors.push('Un número');
+    if (!/[^A-Za-z0-9]/.test(p)) errors.push('Un carácter especial');
+    let strength = 0;
+    if (p.length >= 8) strength++;
+    if (p.length >= 12) strength++;
+    if (/[A-Z]/.test(p)) strength++;
+    if (/[a-z]/.test(p)) strength++;
+    if (/[0-9]/.test(p)) strength++;
+    if (/[^A-Za-z0-9]/.test(p)) strength++;
+    const label = ['', 'Débil', 'Débil', 'Media', 'Buena', 'Fuerte', 'Muy fuerte'];
+    const color = ['', '#ef4444', '#ef4444', '#f59e0b', '#22c55e', '#22c55e', '#16a34a'];
+    return { errors, strength, label: label[strength], color: color[strength] };
+  })();
 
   if (loading) {
     return <div style={{ padding: '100px', textAlign: 'center' }} role="status"><h2>Cargando panel... ⚽</h2></div>;
@@ -869,12 +905,18 @@ const PanelJugador = () => {
                 <div>
                   <div style={{ fontSize: '11px', color: 'var(--gray4)', fontWeight: 600, marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>Contraseña</div>
                   <p style={{ fontSize: '13px', color: 'var(--textMid)', margin: '6px 0 14px', lineHeight: 1.4 }}>
-                    Actualízala si sospechas actividad extraña o por seguridad periódica.
+                    {esGoogleAuth
+                      ? 'Aún no tienes contraseña. Establécelas para iniciar sesión con correo y contraseña.'
+                      : 'Actualízala si sospechas actividad extraña o por seguridad periódica.'}
                   </p>
-                  <div style={{ textAlign: 'center' }}>
-                    <button onClick={() => setPasswordModal(true)}
+                    <div style={{ textAlign: 'center' }}>
+                    <button onClick={async () => {
+                      const res = await jugadorService.obtenerPerfil();
+                      setEsGoogleAuth(res?.data?.esGoogleAuth === true);
+                      setPasswordModal(true);
+                    }}
                       style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--gray3)', background: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '13px' }}>
-                      Cambiar contraseña
+                      {esGoogleAuth ? 'Establecer contraseña' : 'Cambiar contraseña'}
                     </button>
                   </div>
                 </div>
@@ -1159,38 +1201,60 @@ const PanelJugador = () => {
         </div>
       )}
 
-      {/* MODAL CAMBIAR CONTRASEÑA */}
+      {/* MODAL CAMBIAR/ESTABLECER CONTRASEÑA */}
       {passwordModal && (
         <div className="overlay" style={{ display: 'flex', position: 'fixed', inset: 0, zIndex: 1100, background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
-          onClick={() => { if (!passwordSaving) setPasswordModal(false); }}>
+          onClick={() => { if (!passwordSaving) { setPasswordModal(false); setEsGoogleAuth(false); } }}>
           <div className="modal" style={{ background: 'white', borderRadius: 'var(--r24)', width: '100%', maxWidth: '420px', padding: '28px' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#1a2033' }}>Cambiar contraseña</h3>
-            <p style={{ color: '#5a6478', fontSize: '13px', marginBottom: '20px' }}>Ingresa tu contraseña actual y una nueva.</p>
+            <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', color: '#1a2033' }}>{esGoogleAuth ? 'Establecer contraseña' : 'Cambiar contraseña'}</h3>
+            <p style={{ color: '#5a6478', fontSize: '13px', marginBottom: '20px' }}>
+              {esGoogleAuth
+                ? 'Establece una contraseña para tu cuenta. Luego podrás iniciar sesión con correo y contraseña.'
+                : 'Ingresa tu contraseña actual y una nueva.'}
+            </p>
             <form onSubmit={handleGuardarPassword}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#475569' }}>Contraseña actual</label>
-                <input type="password" required value={passwordForm.currentPassword}
-                  onChange={e => setPasswordForm(d => ({ ...d, currentPassword: e.target.value }))}
-                  style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box', fontSize: '14px' }} />
-              </div>
-              <div style={{ marginBottom: '16px' }}>
+              {!esGoogleAuth && (
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#475569' }}>Contraseña actual</label>
+                  <input type="password" required value={passwordForm.currentPassword}
+                    onChange={e => setPasswordForm(d => ({ ...d, currentPassword: e.target.value }))}
+                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box', fontSize: '14px' }} />
+                </div>
+              )}
+              <div style={{ marginBottom: '12px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#475569' }}>Nueva contraseña</label>
-                <input type="password" required minLength={6} value={passwordForm.newPassword}
-                  onChange={e => setPasswordForm(d => ({ ...d, newPassword: e.target.value }))}
+                <input type="password" required value={passwordForm.newPassword}
+                  onChange={e => { setPasswordForm(d => ({ ...d, newPassword: e.target.value })); }}
                   style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box', fontSize: '14px' }} />
+                {passwordForm.newPassword && (
+                  <div style={{ marginTop: '6px' }}>
+                    <div style={{ height: '4px', borderRadius: '2px', backgroundColor: '#e2e8f0', overflow: 'hidden' }}>
+                      <div style={{ width: `${(pwdValidation.strength / 6) * 100}%`, height: '100%', backgroundColor: pwdValidation.color, transition: 'width 0.2s, background 0.2s' }} />
+                    </div>
+                    <span style={{ fontSize: '10px', color: pwdValidation.color, fontWeight: 600, marginTop: '2px', display: 'block' }}>
+                      {pwdValidation.label}
+                    </span>
+                    <ul style={{ fontSize: '10px', color: '#64748b', margin: '4px 0 0', paddingLeft: '14px', listStyle: 'disc', lineHeight: 1.5 }}>
+                      {pwdValidation.errors.map((e, i) => (
+                        <li key={i} style={{ color: '#ef4444' }}>{e}</li>
+                      ))}
+                      {pwdValidation.strength >= 6 && <li style={{ color: '#22c55e' }}>Contraseña muy segura ✓</li>}
+                    </ul>
+                  </div>
+                )}
               </div>
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#475569' }}>Confirmar nueva contraseña</label>
-                <input type="password" required minLength={6} value={passwordForm.confirmPassword}
+                <input type="password" required value={passwordForm.confirmPassword}
                   onChange={e => setPasswordForm(d => ({ ...d, confirmPassword: e.target.value }))}
                   style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box', fontSize: '14px' }} />
               </div>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button type="button" onClick={() => { if (!passwordSaving) { setPasswordModal(false); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); } }}
+                <button type="button" onClick={() => { if (!passwordSaving) { setPasswordModal(false); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); setEsGoogleAuth(false); } }}
                   style={{ flex: 1, padding: '10px 20px', borderRadius: '8px', border: '1px solid #d1d5db', background: 'white', fontWeight: 600, cursor: passwordSaving ? 'not-allowed' : 'pointer', fontSize: '14px', color: '#374151' }}>Cancelar</button>
                 <button type="submit" disabled={passwordSaving}
                   style={{ flex: 1, padding: '10px 20px', borderRadius: '8px', border: 'none', background: passwordSaving ? '#94a3b8' : 'var(--dark1)', color: 'white', fontWeight: 600, cursor: passwordSaving ? 'not-allowed' : 'pointer', fontSize: '14px' }}>
-                  {passwordSaving ? 'Guardando...' : 'Guardar contraseña'}</button>
+                  {passwordSaving ? 'Guardando...' : (esGoogleAuth ? 'Establecer contraseña' : 'Guardar contraseña')}</button>
               </div>
             </form>
           </div>

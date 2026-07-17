@@ -6,6 +6,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 import { getSessionCookie, setSessionCookie, eraseSessionCookie } from './utils/cookies';
 import { authService } from './services/authService';
+import { listenAuthBroadcast, broadcastLogin } from './utils/broadcast';
+import { getSocket, on, off } from './services/socket';
 
 const Home = lazy(() => import('./pages/Home'));
 const Buscar = lazy(() => import('./pages/Buscar'));
@@ -65,11 +67,36 @@ function AppContent() {
     return () => clearInterval(pollingRef.current);
   }, [user, navigate]);
 
+  useEffect(() => {
+    return listenAuthBroadcast(
+      () => {
+        if (!user) return;
+        eraseSessionCookie();
+        setUser(null);
+        navigate('/');
+      },
+      () => {}
+    );
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    const handler = () => {
+      authService.logout();
+      setUser(null);
+      navigate('/');
+    };
+    on('sesion:cerrada', handler);
+    getSocket();
+    return () => off('sesion:cerrada');
+  }, [user, navigate]);
+
   const handleLoginSuccess = (userData) => {
     const normalized = { ...userData, role: normalizeRole(userData.role) };
     setUser(normalized);
     setSessionCookie(normalized);
     setIsModalOpen(false);
+    broadcastLogin();
     if (normalized.role === ROL_DUENO) {
       navigate('/panel-dueno');
     } else if (ROLES_JUGADOR.includes(normalized.role)) {
